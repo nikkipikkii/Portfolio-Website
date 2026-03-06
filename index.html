@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nandini | Biotech & ML Engineer</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { dark: '#000000', accent: '#3b82f6' } }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* === THEME: HIGH CONTRAST DARK === */
+        body { background-color: #000000; color: #f3f4f6; overflow-x: hidden; }
+
+        /* Fixed Background Glow */
+        .spotlight {
+            position: fixed; top: -20%; left: 50%; transform: translateX(-50%);
+            width: 800px; height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(80px); z-index: -1;
+            animation: pulse-glow 8s infinite alternate;
+        }
+        @keyframes pulse-glow {
+            0% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+            100% { opacity: 0.8; transform: translateX(-50%) scale(1.1); }
+        }
+
+        /* === ANIMATION: FAST BULK FALL === */
+        @keyframes fall-fast {
+            0% { transform: translateY(-120vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; } /* Instant visibility */
+            85% { transform: translateY(0) rotate(var(--rot)); opacity: 0.4; }
+            95% { transform: translateY(-10px) rotate(var(--rot)); opacity: 0.3; } /* Tiny Bounce */
+            100% { transform: translateY(0) rotate(var(--final-rot)); opacity: 0.2; } /* Settle */
+        }
+
+        .falling-icon {
+            position: absolute;
+            bottom: var(--bottom-pos);
+            left: var(--left-pos);
+            font-size: var(--size);
+            color: var(--color);
+            opacity: 0;
+            animation: fall-fast ease-out forwards;
+            animation-delay: var(--delay);
+            z-index: 0; /* Behind content */
+            filter: drop-shadow(0 0 3px currentColor); /* Neon glow */
+        }
+
+        /* === GLASS CARDS === */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            position: relative; 
+            z-index: 20;
+        }
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-5px);
+        }
+
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(to right, #3b82f6, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* Tabs & Bars */
+        .project-tab { transition: all 0.3s ease; opacity: 0.6; cursor: pointer; }
+        .project-tab:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+        .active-tab { opacity: 1; background: rgba(59, 130, 246, 0.08); border-left-color: #3b82f6; }
+        
+        .skill-bar-bg { background: rgba(255,255,255,0.1); height: 6px; border-radius: 10px; margin-top: 8px; overflow: hidden; }
+        .skill-bar-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width 1s ease-in-out; }
+        
+        /* Corner Float */
+        @keyframes float-slow {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+        .animate-float { animation: float-slow 6s ease-in-out infinite; }
+        .corner-tr { animation-delay: 1s; }
+        .corner-bl { animation-delay: 2s; }
+        .corner-br { animation-delay: 3s; }
+
+        /* Profile Image Hover Effect */
+        .profile-glow {
+            box-shadow: 0 0 40px -10px rgba(59, 130, 246, 0.3);
+            transition: all 0.5s ease;
+        }
+        .profile-glow:hover {
+            box-shadow: 0 0 60px -5px rgba(168, 85, 247, 0.4);
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="antialiased relative min-h-screen">
+
+    <div class="spotlight"></div>
+
+    <div class="fixed top-0 left-0 z-0 pointer-events-none opacity-40">
+        <div class="absolute top-[-60px] left-[-60px] w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-10 left-10 text-blue-500/30 animate-float">
+            <i class="fa-solid fa-dna text-[120px] transform -rotate-45"></i>
+        </div>
+    </div>
+    <div class="fixed top-0 right-0 z-0 pointer-events-none opacity-40">
+        <div class="absolute top-[-60px] right-[-60px] w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-10 right-10 text-purple-500/30 animate-float corner-tr">
+            <i class="fa-solid fa-microchip text-[100px] transform rotate-12"></i>
+        </div>
+    </div>
+    <div class="fixed bottom-0 left-0 z-0 pointer-events-none opacity-40">
+        <div class="absolute bottom-[-60px] left-[-60px] w-64 h-64 bg-green-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-10 left-10 text-green-500/20 animate-float corner-bl">
+            <i class="fa-solid fa-microscope text-[110px] transform rotate-6"></i>
+        </div>
+    </div>
+    <div class="fixed bottom-0 right-0 z-0 pointer-events-none opacity-40">
+        <div class="absolute bottom-[-60px] right-[-60px] w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-[-10px] right-[-10px] text-blue-500/30 animate-float corner-br">
+            <i class="fa-solid fa-circle-nodes text-[140px] transform -rotate-12"></i>
+        </div>
+    </div>
+
+    <div id="spill-container" class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0"></div>
+
+    <nav class="fixed top-0 w-full z-50 bg-[#000000]/80 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold tracking-tighter hover:opacity-80 transition"><span class="text-blue-500">N</span>andini.</a>
+            
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
+                <a href="#experience" class="hover:text-white transition-colors"><span class="text-blue-500">01.</span> Experience</a>
+                <a href="#projects" class="hover:text-white transition-colors"><span class="text-blue-500">02.</span> Work</a>
+                <a href="#bio" class="hover:text-white transition-colors"><span class="text-blue-500">03.</span> About</a>
+                <a href="blog.html" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
+                    <span class="text-blue-500">04.</span> Blog <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-0.5"></i>
+                </a>
+                <a href="#skills" class="hover:text-white transition-colors"><span class="text-blue-500">05.</span> Skills</a>
+            </div>
+            
+            <a href="#contact" class="px-5 py-2 text-xs font-bold bg-white text-black rounded-full hover:bg-gray-200 transition">Let's Talk</a>
+        </div>
+    </nav>
+
+    <header id="about" class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative pt-20 z-10">
+        <div data-aos="fade-down" class="mb-6 inline-flex items-center px-3 py-1 rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-400 text-xs font-medium tracking-wide">
+            <span class="w-2 h-2 rounded-full bg-blue-500 mr-2 animate-pulse"></span> OPEN TO WORK
+        </div>
+        <h1 data-aos="fade-up" data-aos-delay="100" class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6">
+            Biotech meets <br> <span class="text-gradient">Machine Intelligence</span>
+        </h1>
+        <p data-aos="fade-up" data-aos-delay="200" class="max-w-2xl text-lg text-gray-300 leading-relaxed mb-10">
+            I'm <strong>Nandini</strong>, a Biotechnology student on the pathology track combining domain knowledge with deep engineering to build <strong>medical AI platforms</strong>.
+        </p>
+        <div data-aos="fade-up" data-aos-delay="300" class="flex flex-col sm:flex-row gap-4">
+            <a href="#projects" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold transition shadow-[0_0_30px_rgba(59,130,246,0.4)]">View My Work</a>
+        </div>
+        <div class="absolute bottom-10 animate-bounce text-gray-500"><i class="fa-solid fa-arrow-down"></i></div>
+    </header>
+
+    <section id="experience" class="py-32 px-6 max-w-4xl mx-auto z-10 relative">
+        <h2 class="text-3xl font-bold mb-16 flex items-center gap-3" data-aos="fade-right"><span class="text-blue-500">01.</span> Experience</h2>
+        <div class="relative pl-8 md:pl-0">
+            <div class="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-gray-800 transform -translate-x-1/2 hidden md:block"></div>
+            <div class="md:flex justify-between items-center w-full mb-16 relative" data-aos="fade-up">
+                  <div class="md:w-[45%] mb-4 md:mb-0 md:text-right">
+                    <h3 class="text-xl font-bold text-white">Data Science Intern</h3>
+                    <p class="text-blue-400 font-mono text-sm mb-2">Rubixe -  AI Solutions Company</p>
+                    <p class="text-gray-400 text-sm">Spearheaded the development of a CNN-based pathology screening tool, reducing diagnosis time by 40%.</p>
+                </div>
+                <div class="absolute left-[-2rem] md:left-1/2 top-0 w-4 h-4 bg-blue-500 rounded-full transform md:-translate-x-1/2 border-4 border-[#000000]"></div>
+                <div class="md:w-[45%]"><span class="text-xs font-mono text-gray-400 border border-gray-700 px-2 py-1 rounded">Jan 2025 - Present</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects" class="py-32 px-6 z-10 relative">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-4xl font-bold mb-4">Featured <span class="text-blue-500">02. Projects</span></h2>
+                <p class="text-gray-400">A showcase of my journey bridging academic research and professional implementation.</p>
+            </div>
+    
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-4 space-y-4" data-aos="fade-right">
+                    <div class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group"></i> Project Archive
+                    </div>
+                    
+                    <button onclick="selectProject('oncorisk')" id="tab-oncorisk" class="project-tab active-tab w-full text-left glass-card p-5 rounded-xl border-l-4 border-l-red-500">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                            <span class="text-sm font-bold">OncoRisk Platform</span>
+                        </div>
+                        <p class="text-xs text-gray-400">Predictive Oncology / ML</p>
+                    </button>
+
+                    <button onclick="selectProject('cataract')" id="tab-cataract" class="project-tab w-full text-left glass-card p-5 rounded-xl border-l-4 border-l-transparent">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                            <span class="text-sm font-bold">Cataract AI Diagnostics</span>
+                        </div>
+                        <p class="text-xs text-gray-400">Medical Computer Vision</p>
+                    </button>
+
+                    <button onclick="selectProject('histology')" id="tab-histology" class="project-tab w-full text-left glass-card p-5 rounded-xl border-l-4 border-l-transparent">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <span class="text-sm font-bold">Auto-Histopathology</span>
+                        </div>
+                        <p class="text-xs text-gray-400">Machine Learning / Pathology</p>
+                    </button>
+
+                    </div>
+    
+                <div class="lg:col-span-8" id="project-detail-view" data-aos="fade-left">
+                    </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="bio" class="py-32 px-6 max-w-5xl mx-auto z-10 relative border-t border-white/5">
+        <div class="flex flex-col md:flex-row items-center gap-16">
+            
+            <div class="md:w-1/2" data-aos="fade-right">
+                <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                    <span class="text-blue-500">03.</span> About Me
+                </h2>
+                
+                <div class="space-y-6 text-gray-400 leading-relaxed">
+                    <p>sequence analysis using tools such as BLAST and QIIME2</p>
+                        <p>
+                        Hello! My name is <strong class="text-white">Nandini</strong> and I enjoy building things that live at the intersection of biology and code. My interest in <span class="text-blue-400"> interdisciplinary Biolotechnology and Machine Learning</span> started back in 2025 when I tried sequence analysis using tools such as BLAST and QIIME2. 
+                    </p>
+                    <!-- <p>
+                        Hello! My name is <strong class="text-white">Nandini</strong> and I enjoy building things that live at the intersection of biology and code. My interest in <span class="text-blue-400"> interdisciplinary Biolotechnology and Machine Learning</span> started back in 2025 when I tried to automate cell counting in a petri dish using Python—turns out, I loved the Python part more than the petri dish!
+                    </p> -->
+                    <p>
+                        Fast-forward to today, and I’ve had the privilege of working at a <span class="text-blue-400">HealthTech Start-up</span>, a <span class="text-purple-400">Rubixe - AI Solutions Company </span>, and a student-led AI initiative.
+                    </p>
+                    <p>
+                        My main focus these days is building accessible, inclusive products and digital experiences for <strong class="text-white">Medical Professionals</strong> using modern deep learning architectures.
+                    </p>
+                </div>
+
+                <div class="mt-8">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Interests</h4>
+                    <ul class="grid grid-cols-2 gap-2 text-sm text-gray-300 font-mono">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Genomics</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Computer Vision</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Distributed Systems</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Ethics in AI</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="md:w-1/2 flex justify-center" data-aos="fade-left">
+                <div class="relative group w-72 h-80">
+                    <div class="absolute inset-0 border-2 border-blue-500/30 rounded-2xl transform translate-x-4 translate-y-4 group-hover:translate-x-2 group-hover:translate-y-2 transition duration-300"></div>
+                    
+                    <div class="absolute inset-0 bg-[#111] rounded-2xl overflow-hidden profile-glow border border-white/10 flex items-center justify-center relative">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-blue-900/40 to-purple-900/40 opacity-50"></div>
+                        <div class="text-center z-10">
+                            <i class="fa-solid fa-dna text-6xl text-blue-500 mb-4 opacity-80"></i>
+                            <div class="text-xs font-mono text-gray-500">&lt;coder /&gt;<br>&lt;biologist /&gt;</div>
+                        </div>
+                        
+                        <div class="absolute inset-0 bg-blue-900/80 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                            <span class="font-bold text-white tracking-widest">HIRE ME</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="skills" class="py-32 px-6 z-10 relative">
+        <div class="max-w-5xl mx-auto text-center">
+            <h2 class="text-3xl font-bold mb-16" data-aos="fade-up"><span class="text-blue-500">04.</span> Technical Arsenal</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center gap-3 hover:bg-white/10 transition" data-aos="zoom-in"><i class="fa-brands fa-python text-3xl text-yellow-400"></i><span class="text-sm font-medium">Python</span></div>
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center gap-3 hover:bg-white/10 transition" data-aos="zoom-in" data-aos-delay="50"><i class="fa-solid fa-fire text-3xl text-orange-500"></i><span class="text-sm font-medium">PyTorch</span></div>
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center gap-3 hover:bg-white/10 transition" data-aos="zoom-in" data-aos-delay="100"><i class="fa-brands fa-js text-3xl text-yellow-300"></i><span class="text-sm font-medium">JavaScript</span></div>
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center gap-3 hover:bg-white/10 transition" data-aos="zoom-in" data-aos-delay="150"><i class="fa-brands fa-docker text-3xl text-blue-400"></i><span class="text-sm font-medium">Docker</span></div>
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center gap-3 hover:bg-white/10 transition" data-aos="zoom-in" data-aos-delay="200"><i class="fa-brands fa-aws text-3xl text-white"></i><span class="text-sm font-medium">AWS</span></div>
+                <div class="glass-card p-4 rounded-xl flex flex-col items-center gap-3 hover:bg-white/10 transition" data-aos="zoom-in" data-aos-delay="250"><i class="fa-solid fa-database text-3xl text-green-400"></i><span class="text-sm font-medium">SQL</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-32 px-6 max-w-4xl mx-auto z-10 relative">
+        <div class="glass-card p-10 rounded-3xl border border-white/10" data-aos="fade-up">
+            <div class="text-center mb-10"><h2 class="text-3xl font-bold mb-4">Get In Touch</h2><p class="text-gray-400">Got a question about Pathology AI? I'll try my best to get back to you!</p></div>
+            <form class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><label class="block text-xs font-bold text-gray-500 uppercase mb-2">Name</label><input type="text" class="w-full bg-[#111] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition" placeholder="Dr. Smith"></div>
+                    <div><label class="block text-xs font-bold text-gray-500 uppercase mb-2">Email</label><input type="email" class="w-full bg-[#111] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition" placeholder="hello@biotech.com"></div>
+                </div>
+                <div><label class="block text-xs font-bold text-gray-500 uppercase mb-2">Message</label><textarea rows="4" class="w-full bg-[#111] border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition" placeholder="Let's build something..."></textarea></div>
+                <button class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-lg transition shadow-lg shadow-blue-600/20">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center text-gray-600 text-sm border-t border-white/10 z-10 relative">
+        <p class="mb-4">© 2026 Nandini. Built with <span class="text-red-500">♥</span> and Code.</p>
+        <a href="blog.html" target="_blank" class="text-gray-500 hover:text-blue-500 transition mb-4 inline-block font-medium">Read my Blog <i class="fa-solid fa-arrow-right ml-1"></i></a>
+        <div class="flex justify-center gap-6 mt-2 text-xl">
+            <a href="https://github.com/nikkipikkii/" class="hover:text-white transition"><i class="fa-brands fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/nandini-s-73b3953a5/" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
+            <!-- <a href="#" class="hover:text-white transition"><i class="fa-brands fa-twitter"></i></a> -->
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 100 });
+
+        // --- BACKGROUND ANIMATION LOGIC (UPDATED: 2-STEP BULK) ---
+        function createSpill() {
+            const container = document.getElementById('spill-container');
+            const icons = ['fa-dna', 'fa-microchip', 'fa-flask', 'fa-code', 'fa-brain', 'fa-bacteria', 'fa-server', 'fa-notes-medical', 'fa-robot', 'fa-vial', 'fa-network-wired', 'fa-file-code'];
+            const colors = ['#60a5fa', '#a78bfa', '#34d399', '#f472b6', '#22d3ee'];
+            
+            spawnWave(container, icons, colors, 30, 0);
+
+            setTimeout(() => {
+                spawnWave(container, icons, colors, 30, 0);
+            }, 400);
+        }
+
+        function spawnWave(container, icons, colors, count, baseDelay) {
+            for(let i=0; i<count; i++) { 
+                const icon = document.createElement('i');
+                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+                icon.classList.add('fa-solid', randomIcon, 'falling-icon');
+                const leftPos = Math.floor(Math.random() * 95) + '%'; 
+                const bottomPos = Math.floor(Math.random() * 150) + 'px'; 
+                const speed = (Math.random() * 0.4 + 0.8) + 's'; 
+                const delay = (baseDelay + Math.random() * 0.2) + 's'; 
+                const size = Math.floor(Math.random() * 25 + 15) + 'px'; 
+                const rotation = Math.floor(Math.random() * 360) + 'deg';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                icon.style.setProperty('--left-pos', leftPos);
+                icon.style.setProperty('--bottom-pos', bottomPos);
+                icon.style.setProperty('--delay', delay);
+                icon.style.setProperty('--size', size);
+                icon.style.setProperty('--rot', rotation);
+                icon.style.setProperty('--final-rot', Math.floor(Math.random() * 360) + 'deg');
+                icon.style.setProperty('--color', color);
+                icon.style.animationDuration = speed;
+                container.appendChild(icon);
+            }
+        }
+
+        window.addEventListener('load', createSpill);
+
+        // --- PROJECT DATA ---
+        const projects = {
+            oncorisk: {
+                title: "OncoRisk: Survival Predictor", 
+                link: "https://onco-survival-ml-front-end.vercel.app/",
+                status: "Live", type: "Machine Learning",
+                date: "Oct 2025 - Present", team: "Biotech AI Initiative",
+                desc: "An advanced oncology risk assessment platform utilizing machine learning models to predict patient survival outcomes. The system integrates clinical parameters to provide actionable insights for oncology professionals.",
+                tech: ["Python", "TensorFlow", "React", "FastAPI"],
+                achievements: ["Real-time survival prediction", "Interactive clinical dashboard", "Cloud-native deployment"],
+                skills: { "ML Modeling": "95%", "Oncology Data": "88%", "Full-stack": "82%" }
+            },
+            cataract: {
+                title: "Cataract AI Diagnostics", 
+                link: "https://github.com/nikkipikkii/Cataract.net",
+                status: "In Development", type: "Medical AI",
+                date: "Feb 2026 - Present", team: "Cataract.net Research Team",
+                desc: "Engineered a hierarchical deep learning pipeline for automated cataract detection and maturity grading. Developed a multi-model architecture using PyTorch to classify clinical eye images, integrated with a real-time Gradio interface for diagnostic support.",
+                tech: ["Python", "PyTorch", "Gradio", "Torchvision", "OpenCV"],
+                achievements: ["Hierarchical multi-model inference", "Automated clinical image preprocessing", "Real-time web deployment"],
+                skills: { "Deep Learning": "94%", "Computer Vision": "90%", "Medical Imaging": "87%" }
+            },
+            histology: {
+                title: "Auto-Histopathology Analysis", 
+                link: "#",
+                status: "In Production", type: "Professional",
+                date: "Jan 2025 - Present", team: "HealthTech AI Team",
+                desc: "Developed and deployed a custom CNN architecture for identifying cancerous tissue samples. This tool automated 60% of routine screenings, ensuring data integrity and compliance.",
+                tech: ["Python", "PyTorch", "OpenCV", "FastAPI"],
+                achievements: ["Successful legacy system migration", "Automated workflows", "98.4% model accuracy"],
+                skills: { "PyTorch": "92%", "Computer Vision": "88%", "Data Privacy": "90%" }
+            }
+            /* labsync: {
+                title: "Lab-Sync Secure API", 
+                link: "#",
+                status: "Completed", type: "API Design",
+                date: "Jan 2024 - May 2024", team: "Lab-Connect Integration",
+                desc: "Engineered a high-performance Node.js API that bridges wet-lab equipment data with secure electronic health records (EHR). Focused on low-latency data synchronization.",
+                tech: ["Node.js", "PostgreSQL", "Redis", "HL7/FHIR"],
+                achievements: ["Secure EHR sync", "Low-latency architecture", "FHIR standard compliance"],
+                skills: { "Backend Dev": "94%", "Database Design": "86%", "API Security": "92%" }
+            } 
+            */
+        };
+
+        function selectProject(id) {
+            const project = projects[id];
+            const detailView = document.getElementById('project-detail-view');
+            
+            document.querySelectorAll('.project-tab').forEach(tab => {
+                tab.classList.remove('active-tab');
+                tab.style.borderLeftColor = 'transparent';
+            });
+            const activeTab = document.getElementById(`tab-${id}`);
+            activeTab.classList.add('active-tab');
+
+            const borderColors = {
+                'oncorisk': '#ef4444',
+                'cataract': '#a855f7',
+                'histology': '#3b82f6'
+            };
+            activeTab.style.borderLeftColor = borderColors[id] || '#3b82f6';
+
+            detailView.style.opacity = '0';
+            setTimeout(() => {
+                detailView.innerHTML = `
+                    <div class="glass-card p-10 rounded-2xl border border-white/10 h-full relative group">
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="px-3 py-1 bg-white/5 border border-white/20 rounded-full text-[10px] font-bold text-gray-300">● ${project.status}</span>
+                            <span class="px-3 py-1 bg-blue-500/10 border border-blue-500/30 rounded-full text-[10px] font-bold text-blue-400">🏆 ${project.type}</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-3xl font-bold mb-2">${project.title}</h3>
+                            <a href="${project.link}" target="_blank" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-blue-600 hover:scale-110 transition">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-sm"></i>
+                            </a>
+                        </div>
+
+                        <p class="text-gray-400 font-mono text-xs mb-6"><i class="fa-regular fa-calendar mr-1"></i> ${project.date} &nbsp; <i class="fa-solid fa-users mr-1"></i> ${project.team}</p>
+                        <p class="text-gray-300 leading-relaxed mb-6">${project.desc}</p>
+                        
+                        <a href="${project.link}" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold rounded-lg transition shadow-lg shadow-blue-500/20 mb-10">
+                            View Live Project <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </a>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 border-t border-white/10 pt-8">
+                            <div>
+                                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6">Technologies</h4>
+                                <div class="flex flex-wrap gap-2 mb-8">${project.tech.map(t => `<span class="bg-white/5 border border-white/20 px-3 py-1 rounded text-xs text-gray-300">${t}</span>`).join('')}</div>
+                                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Key Achievements</h4>
+                                <ul class="space-y-2">${project.achievements.map(a => `<li class="text-sm text-gray-400 flex items-start gap-2"><span class="text-blue-500">●</span> ${a}</li>`).join('')}</ul>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6">Skills Metric</h4>
+                                <div class="space-y-5">${Object.entries(project.skills).map(([s, v]) => `<div><div class="flex justify-between text-xs font-medium"><span>${s}</span><span class="text-gray-500">${v}</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width: ${v}"></div></div></div>`).join('')}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                detailView.style.opacity = '1';
+            }, 200);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => selectProject('oncorisk'));
+    </script>
+</body>
+</html>
