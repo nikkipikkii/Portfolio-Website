@@ -219,11 +219,99 @@
 
         const posts = [
             {
+                id: 10,
+                title: "Where Does O(n log n) Come From? Recursion, Sorting, and Algorithmic Scaling",
+                date: "April 23, 2026",
+                category: "Computer Science",
+                isNew: true,
+                content: `
+                    <span class="text-orange-500 font-mono text-xs mb-4 block">COMPUTER SCIENCE • 7 MIN READ</span>
+                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Where Does O(n log n) Come From? Recursion, Sorting, and Algorithmic Scaling</h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                    The <code>O(n log n)</code> time complexity is the gold standard for comparison-based sorting. But it is not just an algebraic artifact; it is a direct geometric consequence of how information scales when we divide and conquer.
+                    </p>
+
+                    <h2>The Geometry of a Recursion Tree</h2>
+                    <p>
+                    When we look at algorithms like Merge Sort, the intuition behind <code>O(n log n)</code> becomes visual. The algorithm recursively halves the array until it reaches base cases of single elements. This creates a binary tree of subproblems.
+                    </p>
+
+                    <p>
+                    The height of this tree is exactly <code>log₂(n)</code> because that is how many times you can divide a number <code>n</code> by 2 before reaching 1. However, at every single level of this tree, the merging process must look at all <code>n</code> elements across all the active subproblems to put them back together. 
+                    </p>
+                    
+                    <pre><code>Total Work = (Work per level) × (Number of levels)
+Total Work = n × log₂(n)</code></pre>
+
+                    <p>
+                    The complexity is simply the area of the recursion tree.
+                    </p>
+
+                    <h2>The Decision Tree Lower Bound</h2>
+                    <p>
+                    But why can't we do better? Why is <code>O(n log n)</code> the absolute mathematical floor for sorting by comparisons? The answer lies in information theory.
+                    </p>
+
+                    <p>
+                    Sorting an array of <code>n</code> elements means finding the correct permutation out of <code>n!</code> (n-factorial) possible permutations. Every time an algorithm compares two elements (is A > B?), it learns one bit of information, effectively splitting the pool of possible valid permutations in half.
+                    </p>
+
+                    <p>
+                    To distinguish between <code>n!</code> possible outcomes using binary questions, you need a decision tree with at least <code>n!</code> leaves. The minimum height of such a tree is <code>log₂(n!)</code>. By Stirling's approximation, <code>log₂(n!)</code> scales precisely as <code>n log n - n</code>. 
+                    </p>
+
+                    <h2>Information, Not Just Operations</h2>
+                    <p>
+                    This reveals a profound truth about computation. <code>O(n log n)</code> is not merely a description of how many operations a CPU performs. It is the fundamental measure of how much information is required to organize chaos into order. You cannot cheat the universe; to resolve <code>n!</code> possibilities, you must ask at least <code>O(n log n)</code> questions.
+                    </p>
+                `
+            },
+            {
+                id: 9,
+                title: "From Equations to Systems: Modeling Biological Data Computationlly",
+                date: "April 23, 2026",
+                category: "Computational Biology",
+                isNew: true,
+                content: `
+                    <span class="text-emerald-500 font-mono text-xs mb-4 block">COMPUTATIONAL BIOLOGY • 8 MIN READ</span>
+                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">From Equations to Systems: Modeling Biological Data Computationlly</h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Biology is not governed by single, isolated equations. It is governed by networks. When we shift from studying individual pathways to systemic risk, our computational architectures must undergo a radical transformation.
+                    </p>
+
+                    <h2>The Limitation of the Single Equation</h2>
+                    <p>
+                    For decades, biological modeling relied heavily on ordinary differential equations (ODEs) to describe enzyme kinetics or population dynamics. While mathematically elegant, these models often fail when confronted with the immense dimensional complexity of a living system. A single equation maps a specific input to a specific output, but in biology, every output loops back into a thousand different inputs.
+                    </p>
+
+                    <p>
+                    When modeling complex outcomes—such as survival probabilities in oncology—we cannot rely on linear biological assumptions. The state space is too vast, and the interactions are too non-linear.
+                    </p>
+
+                    <h2>Dual-Model Architectures and Risk Stratification</h2>
+                    <p>
+                    This is where modern machine learning architectures provide a distinct advantage. Instead of trying to force a single model to capture both the underlying biological state and the timeline of disease progression, we can decompose the problem.
+                    </p>
+
+                    <p>
+                    A dual-model architecture effectively mirrors this decomposition. One part of the network handles risk stratification—learning the deep, non-linear representations of high-dimensional genomic or clinical data. The second part models the temporal dimension, such as the hazard functions used in survival analysis. 
+                    </p>
+
+                    <pre><code>Model 1: Representation Learning -> Z (Latent Patient State)
+Model 2: Hazard Function(Z, t) -> P(Survival | t)</code></pre>
+
+                    <h2>Systems, Not Variables</h2>
+                    <p>
+                    The shift from equations to systems is a shift in philosophy. We stop asking "what does this variable do?" and start asking "how does the geometry of this data manifold dictate survival?" By leveraging robust, deployed machine learning systems, we stop approximating biology as a simple equation and start respecting it as the highly complex, interconnected network it actually is.
+                    </p>
+                `
+            },
+            {
                 id: 7,
                 title: "Why Optimization Lies: The Geometry of Loss Landscapes",
                 date: "April 15, 2026",
                 category: "Optimization Theory",
-                isNew: true,
+                isNew: false,
                 content: `
                     <span class="text-pink-500 font-mono text-xs mb-4 block">OPTIMIZATION THEORY • 9 MIN READ</span>
                     <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Why Optimization Lies: The Geometry of Loss Landscapes</h1>
@@ -325,7 +413,7 @@ Sharp minimum: large ||H||, low volume basin</code></pre>
                 title: "The Curse of Dimensionality is a Lie: How Data Lives in Lower Dimensions",
                 date: "April 15, 2026",
                 category: "Geometric Deep Learning",
-                isNew: true,
+                isNew: false,
                 content: `
                     <span class="text-cyan-500 font-mono text-xs mb-4 block">GEOMETRIC DEEP LEARNING • 8 MIN READ</span>
                     <h1 class="text-4xl font-bold mb-6 text-white leading-tight">The Curse of Dimensionality is a Lie: How Data Lives in Lower Dimensions</h1>
@@ -445,7 +533,7 @@ a manifold M with dim(M) = d ≪ D</code></pre>
                 title: "The Mathematics of Uncertainty: Bayesian Inference Beyond Point Estimates",
                 date: "Feb 08, 2026",
                 category: "Mathematics & Inference",
-                isNew: true,
+                isNew: false,
                 content: `
                     <span class="text-purple-500 font-mono text-xs mb-4 block">PROBABILITY & INFERENCE • 7 MIN READ</span>
                     <h1 class="text-4xl font-bold mb-6 text-white leading-tight">The Mathematics of Uncertainty: Bayesian Inference Beyond Point Estimates</h1>
@@ -526,13 +614,29 @@ a manifold M with dim(M) = d ≪ D</code></pre>
                     </p>
                 `
             },
-           
+            {
+                id: 1,
+                title: "Scaling Histopathology AI",
+                date: "Feb 06, 2026",
+                category: "Pathology",
+                isNew: false,
+                content: `
+                    <span class="text-blue-500 font-mono text-xs mb-4 block">PATHOLOGY • 8 MIN READ</span>
+                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Scaling Histopathology AI in Clinical Workflows</h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">Analyzing the bottlenecks of integrating Deep Learning models into hospital LIS systems and solving the "Ground Truth" problem.</p>
+                    
+                    <h2>The "Ground Truth" Problem</h2>
+                    <p>One of the biggest hurdles in training models for pathology is the disagreement rate between human experts. Unlike a cat vs. dog classifier, identifying the exact grade of a tumor is subjective.</p>
+                    <blockquote>"If two pathologists disagree 30% of the time, what is the model actually learning?"</blockquote>
+                    <p>To solve this, we implemented a <strong>Consensus-Based Labeling Pipeline</strong>. We aggregate annotations from three different sub-specialists and use a weighted voting system to determine the ground truth mask for training our CNNs.</p>
+                `
+            },
             {
                 id: 4,
                 title: "The Mathematics of Structure: Geometry in High-Dimensional Biological Data",
                 date: "Feb 05, 2026",
                 category: "Mathematics & Representation",
-                isNew: true,
+                isNew: false,
                 content: `
                     <span class="text-purple-500 font-mono text-xs mb-4 block">MATHEMATICAL STRUCTURE • 7 MIN READ</span>
                     <h1 class="text-4xl font-bold mb-6 text-white leading-tight">The Mathematics of Structure: Geometry in High-Dimensional Biological Data</h1>
