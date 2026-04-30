@@ -221,7 +221,7 @@
             {
                 id: 7,
                 title: "Why Optimization Lies: The Geometry of Loss Landscapes",
-                date: "Feb 12, 2026",
+                date: "April 15, 2026",
                 category: "Optimization Theory",
                 isNew: true,
                 content: `
@@ -323,7 +323,7 @@ Sharp minimum: large ||H||, low volume basin</code></pre>
             {
                 id: 8,
                 title: "The Curse of Dimensionality is a Lie: How Data Lives in Lower Dimensions",
-                date: "Feb 10, 2026",
+                date: "April 15, 2026",
                 category: "Geometric Deep Learning",
                 isNew: true,
                 content: `
@@ -526,23 +526,7 @@ a manifold M with dim(M) = d ≪ D</code></pre>
                     </p>
                 `
             },
-            {
-                id: 1,
-                title: "Scaling Histopathology AI",
-                date: "Feb 06, 2026",
-                category: "Pathology",
-                isNew: true,
-                content: `
-                    <span class="text-blue-500 font-mono text-xs mb-4 block">PATHOLOGY • 8 MIN READ</span>
-                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Scaling Histopathology AI in Clinical Workflows</h1>
-                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">Analyzing the bottlenecks of integrating Deep Learning models into hospital LIS systems and solving the "Ground Truth" problem.</p>
-                    
-                    <h2>The "Ground Truth" Problem</h2>
-                    <p>One of the biggest hurdles in training models for pathology is the disagreement rate between human experts. Unlike a cat vs. dog classifier, identifying the exact grade of a tumor is subjective.</p>
-                    <blockquote>"If two pathologists disagree 30% of the time, what is the model actually learning?"</blockquote>
-                    <p>To solve this, we implemented a <strong>Consensus-Based Labeling Pipeline</strong>. We aggregate annotations from three different sub-specialists and use a weighted voting system to determine the ground truth mask for training our CNNs.</p>
-                `
-            },
+           
             {
                 id: 4,
                 title: "The Mathematics of Structure: Geometry in High-Dimensional Biological Data",
@@ -775,7 +759,8 @@ a manifold M with dim(M) = d ≪ D</code></pre>
             posts.forEach((post, index) => {
                 const btn = document.createElement('button');
                 btn.className = `w-full text-left p-4 rounded-lg transition-all duration-200 hover:bg-white/10 mb-1 group ${index === 0 ? 'active-post' : 'text-gray-400'}`;
-                btn.onclick = () => loadPost(post.id);
+                // Set updateUrl to true for standard clicks
+                btn.onclick = () => loadPost(post.id, true);
                 btn.id = `btn-${post.id}`;
                 
                 const badgeHTML = post.isNew ? '<span class="badge-new">NEW</span>' : '';
@@ -793,10 +778,18 @@ a manifold M with dim(M) = d ≪ D</code></pre>
                 mobileSelect.appendChild(opt);
             });
 
-            loadPost(posts[0].id);
+            // Parse URL to check if an ID was shared
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlId = urlParams.get('id');
+            
+            // If the URL has a valid ID, load it. Otherwise, load the newest post.
+            const initialId = (urlId && posts.some(p => p.id == urlId)) ? urlId : posts[0].id;
+            
+            // Load initial post without pushing state
+            loadPost(initialId, false); 
         }
 
-        function loadPost(id) {
+        function loadPost(id, updateUrl = true) {
             const post = posts.find(p => p.id == id);
             const contentArea = document.getElementById('post-content');
             
@@ -820,11 +813,29 @@ a manifold M with dim(M) = d ≪ D</code></pre>
             }
             document.getElementById('mobile-select').value = id;
 
+            // Handle the URL update
+            if (updateUrl) {
+                const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + id;
+                window.history.pushState({ path: newUrl }, '', newUrl);
+            }
+
             // Only trigger animations if enabled
             if (animationsEnabled) {
                 triggerSmartSpill();
             }
         }
+
+        // Listen for back/forward browser buttons
+        window.addEventListener('popstate', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlId = urlParams.get('id');
+            
+            if (urlId && posts.some(p => p.id == urlId)) {
+                loadPost(urlId, false); // false = don't push state again
+            } else {
+                loadPost(posts[0].id, false);
+            }
+        });
 
         function toggleAnimations() {
             animationsEnabled = !animationsEnabled;
