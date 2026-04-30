@@ -41,10 +41,10 @@
         /* === ANIMATION: FAST BULK FALL === */
         @keyframes fall-fast {
             0% { transform: translateY(-120vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; } /* Instant visibility */
+            10% { opacity: 1; }
             85% { transform: translateY(0) rotate(var(--rot)); opacity: 0.4; }
-            95% { transform: translateY(-10px) rotate(var(--rot)); opacity: 0.3; } /* Tiny Bounce */
-            100% { transform: translateY(0) rotate(var(--final-rot)); opacity: 0.2; } /* Settle */
+            95% { transform: translateY(-10px) rotate(var(--rot)); opacity: 0.3; }
+            100% { transform: translateY(0) rotate(var(--final-rot)); opacity: 0.2; }
         }
 
         .falling-icon {
@@ -56,8 +56,8 @@
             opacity: 0;
             animation: fall-fast ease-out forwards;
             animation-delay: var(--delay);
-            z-index: 0; /* Behind content */
-            filter: drop-shadow(0 0 3px currentColor); /* Neon glow */
+            z-index: 0;
+            filter: drop-shadow(0 0 3px currentColor);
         }
 
         /* === GLASS CARDS === */
@@ -75,13 +75,11 @@
             transform: translateY(-5px);
         }
 
-        /* Gradient Text */
         .text-gradient {
             background: linear-gradient(to right, #3b82f6, #a855f7);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
-        /* Tabs & Bars */
         .project-tab { transition: all 0.3s ease; opacity: 0.6; cursor: pointer; }
         .project-tab:hover { opacity: 1; background: rgba(255,255,255,0.08); }
         .active-tab { opacity: 1; background: rgba(59, 130, 246, 0.08); border-left-color: #3b82f6; }
@@ -89,7 +87,6 @@
         .skill-bar-bg { background: rgba(255,255,255,0.1); height: 6px; border-radius: 10px; margin-top: 8px; overflow: hidden; }
         .skill-bar-fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); transition: width 1s ease-in-out; }
         
-        /* Corner Float */
         @keyframes float-slow {
             0% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-10px) rotate(2deg); }
@@ -100,7 +97,6 @@
         .corner-bl { animation-delay: 2s; }
         .corner-br { animation-delay: 3s; }
 
-        /* Profile Image Hover Effect */
         .profile-glow {
             box-shadow: 0 0 40px -10px rgba(59, 130, 246, 0.3);
             transition: all 0.5s ease;
@@ -108,6 +104,118 @@
         .profile-glow:hover {
             box-shadow: 0 0 60px -5px rgba(168, 85, 247, 0.4);
             transform: scale(1.02);
+        }
+
+        /* === MARQUEE STYLES === */
+        @keyframes marquee-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .marquee-container {
+            overflow: hidden;
+            position: relative;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        .marquee-track {
+            display: flex;
+            gap: 1.5rem;
+            animation: marquee-scroll 40s linear infinite;
+            width: max-content;
+        }
+
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        .blog-card-mini {
+            flex: 0 0 320px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: block;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blog-card-mini::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .blog-card-mini:hover::before {
+            left: 100%;
+        }
+
+        .blog-card-mini:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(59, 130, 246, 0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
+        }
+
+        .blog-card-mini .category {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .blog-card-mini .title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .blog-card-mini .preview {
+            font-size: 13px;
+            color: #9ca3af;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .blog-card-mini .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: #6b7280;
+            font-family: monospace;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 12px;
+        }
+
+        .blog-card-mini .read-more {
+            color: #60a5fa;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
     </style>
 </head>
@@ -147,11 +255,11 @@
             <a href="#" class="text-xl font-bold tracking-tighter hover:opacity-80 transition"><span class="text-blue-500">N</span>andini.</a>
             
             <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-400">
-                <a href="#experience" class="hover:text-white transition-colors"><span class="text-blue-500">01.</span> Experience</a>
+                <a href="#about" class="hover:text-white transition-colors"><span class="text-blue-500">01.</span> About</a>
                 <a href="#projects" class="hover:text-white transition-colors"><span class="text-blue-500">02.</span> Work</a>
-                <a href="#bio" class="hover:text-white transition-colors"><span class="text-blue-500">03.</span> About</a>
+                <a href="#blog-marquee" class="hover:text-white transition-colors"><span class="text-blue-500">03.</span> Blog</a>
                 <a href="blog.html" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
-                    <span class="text-blue-500">04.</span> Blog <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-0.5"></i>
+                    <span class="text-blue-500">04.</span> All Posts <i class="fa-solid fa-arrow-up-right-from-square text-[10px] ml-0.5"></i>
                 </a>
                 <a href="#skills" class="hover:text-white transition-colors"><span class="text-blue-500">05.</span> Skills</a>
             </div>
@@ -160,7 +268,7 @@
         </div>
     </nav>
 
-    <header id="about" class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative pt-20 z-10">
+    <header class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative pt-20 z-10">
         <div data-aos="fade-down" class="mb-6 inline-flex items-center px-3 py-1 rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-400 text-xs font-medium tracking-wide">
             <span class="w-2 h-2 rounded-full bg-blue-500 mr-2 animate-pulse"></span> OPEN TO WORK
         </div>
@@ -176,22 +284,108 @@
         <div class="absolute bottom-10 animate-bounce text-gray-500"><i class="fa-solid fa-arrow-down"></i></div>
     </header>
 
-    <section id="experience" class="py-32 px-6 max-w-4xl mx-auto z-10 relative">
-        <h2 class="text-3xl font-bold mb-16 flex items-center gap-3" data-aos="fade-right"><span class="text-blue-500">01.</span> Experience</h2>
-        <div class="relative pl-8 md:pl-0">
-            <div class="absolute left-8 md:left-1/2 top-0 bottom-0 w-px bg-gray-800 transform -translate-x-1/2 hidden md:block"></div>
-            <div class="md:flex justify-between items-center w-full mb-16 relative" data-aos="fade-up">
-                  <div class="md:w-[45%] mb-4 md:mb-0 md:text-right">
-                    <h3 class="text-xl font-bold text-white">Data Science Intern</h3>
-                    <p class="text-blue-400 font-mono text-sm mb-2">Rubixe -  AI Solutions Company</p>
-                    <p class="text-gray-400 text-sm">Spearheaded the development of a CNN-based pathology screening tool, reducing diagnosis time by 40%.</p>
+    <!-- ============================================== -->
+    <!-- SECTION 01: ABOUT ME (MERGED WITH EXPERIENCE)  -->
+    <!-- ============================================== -->
+    <section id="about" class="py-32 px-6 max-w-5xl mx-auto z-10 relative">
+        <div class="flex flex-col md:flex-row items-start gap-16">
+            
+            <!-- LEFT SIDE: ABOUT TEXT -->
+            <div class="md:w-1/2" data-aos="fade-right">
+                <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                    <span class="text-blue-500">01.</span> About Me
+                </h2>
+                
+                <div class="space-y-6 text-gray-400 leading-relaxed">
+                    <p>
+                        Hello! My name is <strong class="text-white">Nandini</strong> and I enjoy building things that live at the intersection of biology and code. My interest in <span class="text-blue-400">interdisciplinary Biotechnology and Machine Learning</span> started back in 2025.
+                    </p>
+                    <p>
+                        Fast-forward to today, and I've had the privilege of working at a <span class="text-blue-400">HealthTech Start-up</span>, a <span class="text-purple-400">Rubixe - AI Solutions Company</span>, and a student-led AI initiative.
+                    </p>
+                    <p>
+                        My main focus these days is building accessible, inclusive products and digital experiences for <strong class="text-white">Medical Professionals</strong> using modern deep learning architectures.
+                    </p>
                 </div>
-                <div class="absolute left-[-2rem] md:left-1/2 top-0 w-4 h-4 bg-blue-500 rounded-full transform md:-translate-x-1/2 border-4 border-[#000000]"></div>
-                <div class="md:w-[45%]"><span class="text-xs font-mono text-gray-400 border border-gray-700 px-2 py-1 rounded">Jan 2025 - Present</span></div>
+
+                <div class="mt-8">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Interests</h4>
+                    <ul class="grid grid-cols-2 gap-2 text-sm text-gray-300 font-mono">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Genomics</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Computer Vision</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Distributed Systems</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Ethics in AI</li>
+                    </ul>
+                </div>
             </div>
+
+            <!-- RIGHT SIDE: EXPERIENCE CARD (replacing the decorative border) -->
+            <div class="md:w-1/2 w-full" data-aos="fade-left">
+                <div class="relative group">
+                    
+                    <!-- Glass Card with Experience -->
+                    <div class="glass-card p-8 rounded-2xl profile-glow border border-white/10 relative overflow-hidden">
+                        <!-- Subtle gradient overlay -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20 opacity-50 pointer-events-none"></div>
+                        
+                        <div class="relative z-10">
+                            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                                <i class="fa-solid fa-briefcase text-blue-500"></i>
+                                Current Experience
+                            </h3>
+                            
+                            <!-- Active Status -->
+                            <div class="inline-flex items-center px-3 py-1 rounded-full border border-blue-500/40 bg-blue-500/10 text-blue-400 text-[10px] font-medium tracking-wide mb-4">
+                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2 animate-pulse"></span> CURRENTLY ACTIVE
+                            </div>
+
+                            <h4 class="text-2xl font-bold text-white mb-2">Data Science Intern</h4>
+                            <p class="text-blue-400 font-mono text-sm mb-4">@ Rubixe - AI Solutions Company</p>
+                            
+                            <div class="flex items-center gap-2 mb-6">
+                                <span class="text-xs font-mono text-gray-400 border border-gray-700 px-2 py-1 rounded">
+                                    <i class="fa-regular fa-calendar mr-1"></i> Jan 2025 - Present
+                                </span>
+                            </div>
+
+                            <p class="text-gray-300 leading-relaxed text-sm mb-6">
+                                Spearheaded the development of a CNN-based pathology screening tool, reducing diagnosis time by <strong class="text-blue-400">40%</strong>.
+                            </p>
+
+                            <!-- Key Achievements -->
+                            <div class="space-y-2 border-t border-white/10 pt-4">
+                                <div class="flex items-start gap-2 text-sm text-gray-400">
+                                    <span class="text-blue-500 mt-1">▸</span>
+                                    <span>CNN Architecture Design & Optimization</span>
+                                </div>
+                                <div class="flex items-start gap-2 text-sm text-gray-400">
+                                    <span class="text-blue-500 mt-1">▸</span>
+                                    <span>Medical Image Pipeline Development</span>
+                                </div>
+                                <div class="flex items-start gap-2 text-sm text-gray-400">
+                                    <span class="text-blue-500 mt-1">▸</span>
+                                    <span>Production Model Deployment</span>
+                                </div>
+                            </div>
+
+                            <!-- Tech Stack Pills -->
+                            <div class="flex flex-wrap gap-2 mt-6 pt-6 border-t border-white/10">
+                                <span class="bg-white/5 border border-white/20 px-3 py-1 rounded text-xs text-gray-300">Python</span>
+                                <span class="bg-white/5 border border-white/20 px-3 py-1 rounded text-xs text-gray-300">PyTorch</span>
+                                <span class="bg-white/5 border border-white/20 px-3 py-1 rounded text-xs text-gray-300">TensorFlow</span>
+                                <span class="bg-white/5 border border-white/20 px-3 py-1 rounded text-xs text-gray-300">OpenCV</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
+    <!-- ============================================== -->
+    <!-- SECTION 02: PROJECTS                            -->
+    <!-- ============================================== -->
     <section id="projects" class="py-32 px-6 z-10 relative">
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-16" data-aos="fade-up">
@@ -228,71 +422,163 @@
                         </div>
                         <p class="text-xs text-gray-400">Machine Learning / Pathology</p>
                     </button>
-
-                    </div>
+                </div>
     
                 <div class="lg:col-span-8" id="project-detail-view" data-aos="fade-left">
-                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <section id="bio" class="py-32 px-6 max-w-5xl mx-auto z-10 relative border-t border-white/5">
-        <div class="flex flex-col md:flex-row items-center gap-16">
-            
-            <div class="md:w-1/2" data-aos="fade-right">
-                <h2 class="text-3xl font-bold mb-8 flex items-center gap-3">
-                    <span class="text-blue-500">03.</span> About Me
-                </h2>
-                
-                <div class="space-y-6 text-gray-400 leading-relaxed">
-                    <p>sequence analysis using tools such as BLAST and QIIME2</p>
-                        <p>
-                        Hello! My name is <strong class="text-white">Nandini</strong> and I enjoy building things that live at the intersection of biology and code. My interest in <span class="text-blue-400"> interdisciplinary Biolotechnology and Machine Learning</span> started back in 2025 when I tried sequence analysis using tools such as BLAST and QIIME2. 
-                    </p>
-                    <!-- <p>
-                        Hello! My name is <strong class="text-white">Nandini</strong> and I enjoy building things that live at the intersection of biology and code. My interest in <span class="text-blue-400"> interdisciplinary Biolotechnology and Machine Learning</span> started back in 2025 when I tried to automate cell counting in a petri dish using Python—turns out, I loved the Python part more than the petri dish!
-                    </p> -->
-                    <p>
-                        Fast-forward to today, and I’ve had the privilege of working at a <span class="text-blue-400">HealthTech Start-up</span>, a <span class="text-purple-400">Rubixe - AI Solutions Company </span>, and a student-led AI initiative.
-                    </p>
-                    <p>
-                        My main focus these days is building accessible, inclusive products and digital experiences for <strong class="text-white">Medical Professionals</strong> using modern deep learning architectures.
-                    </p>
+    <!-- ============================================== -->
+    <!-- SECTION 03: BLOG MARQUEE                        -->
+    <!-- ============================================== -->
+    <section id="blog-marquee" class="py-32 z-10 relative border-t border-white/5">
+        <div class="max-w-6xl mx-auto px-6 mb-12">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4" data-aos="fade-up">
+                <div>
+                    <h2 class="text-3xl font-bold mb-3 flex items-center gap-3">
+                        <span class="text-blue-500">03.</span> Latest from the Blog
+                    </h2>
+                    <p class="text-gray-400 max-w-xl">Mathematical perspectives on machine learning, biology, and the intersection of both. <span class="text-blue-400">Hover to pause.</span></p>
                 </div>
-
-                <div class="mt-8">
-                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Interests</h4>
-                    <ul class="grid grid-cols-2 gap-2 text-sm text-gray-300 font-mono">
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Genomics</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Computer Vision</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Distributed Systems</li>
-                        <li class="flex items-center gap-2"><i class="fa-solid fa-caret-right text-blue-500"></i> Ethics in AI</li>
-                    </ul>
-                </div>
+                <a href="blog.html" target="_blank" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition shadow-lg shadow-blue-500/20 flex items-center gap-2 whitespace-nowrap">
+                    Read All Posts <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                </a>
             </div>
+        </div>
 
-            <div class="md:w-1/2 flex justify-center" data-aos="fade-left">
-                <div class="relative group w-72 h-80">
-                    <div class="absolute inset-0 border-2 border-blue-500/30 rounded-2xl transform translate-x-4 translate-y-4 group-hover:translate-x-2 group-hover:translate-y-2 transition duration-300"></div>
-                    
-                    <div class="absolute inset-0 bg-[#111] rounded-2xl overflow-hidden profile-glow border border-white/10 flex items-center justify-center relative">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-blue-900/40 to-purple-900/40 opacity-50"></div>
-                        <div class="text-center z-10">
-                            <i class="fa-solid fa-dna text-6xl text-blue-500 mb-4 opacity-80"></i>
-                            <div class="text-xs font-mono text-gray-500">&lt;coder /&gt;<br>&lt;biologist /&gt;</div>
-                        </div>
-                        
-                        <div class="absolute inset-0 bg-blue-900/80 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
-                            <span class="font-bold text-white tracking-widest">HIRE ME</span>
-                        </div>
+        <!-- Marquee Container -->
+        <div class="marquee-container" data-aos="fade-up" data-aos-delay="200">
+            <div class="marquee-track">
+                <!-- Set 1 of cards -->
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-pink-400">OPTIMIZATION THEORY</span>
+                    <h3 class="title">Why Optimization Lies: The Geometry of Loss Landscapes</h3>
+                    <p class="preview">Gradient descent does not find the minimum. It finds something else entirely. Understanding what that means requires looking at geometry, not values.</p>
+                    <div class="meta">
+                        <span>Feb 12, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
                     </div>
-                </div>
-            </div>
+                </a>
 
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-cyan-400">GEOMETRIC DEEP LEARNING</span>
+                    <h3 class="title">The Curse of Dimensionality is a Lie</h3>
+                    <p class="preview">Every textbook warns about high dimensions. Yet deep learning succeeds in spaces with billions of dimensions. The contradiction is in the assumption, not the data.</p>
+                    <div class="meta">
+                        <span>Feb 10, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-purple-400">PROBABILITY & INFERENCE</span>
+                    <h3 class="title">The Mathematics of Uncertainty: Bayesian Inference Beyond Point Estimates</h3>
+                    <p class="preview">Data does not eliminate uncertainty. It transforms it. What changes with data is not the existence of uncertainty, but its structure.</p>
+                    <div class="meta">
+                        <span>Feb 08, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-blue-400">PATHOLOGY</span>
+                    <h3 class="title">Scaling Histopathology AI in Clinical Workflows</h3>
+                    <p class="preview">Analyzing the bottlenecks of integrating Deep Learning models into hospital LIS systems and solving the "Ground Truth" problem.</p>
+                    <div class="meta">
+                        <span>Feb 06, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-purple-400">MATHEMATICAL STRUCTURE</span>
+                    <h3 class="title">Geometry in High-Dimensional Biological Data</h3>
+                    <p class="preview">High-dimensional data appears complex. Most of the time, it is not. What appears as complexity is often a consequence of representation, not structure.</p>
+                    <div class="meta">
+                        <span>Feb 05, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-purple-400">MATHEMATICAL MODELING</span>
+                    <h3 class="title">From Survival Functions to Distribution Shift</h3>
+                    <p class="preview">A model can be mathematically correct and still fail completely. The failure is not always due to noise, but to incorrect assumptions about how the world behaves.</p>
+                    <div class="meta">
+                        <span>Feb 02, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <!-- Set 2 of cards (duplicate for seamless loop) -->
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-pink-400">OPTIMIZATION THEORY</span>
+                    <h3 class="title">Why Optimization Lies: The Geometry of Loss Landscapes</h3>
+                    <p class="preview">Gradient descent does not find the minimum. It finds something else entirely. Understanding what that means requires looking at geometry, not values.</p>
+                    <div class="meta">
+                        <span>Feb 12, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-cyan-400">GEOMETRIC DEEP LEARNING</span>
+                    <h3 class="title">The Curse of Dimensionality is a Lie</h3>
+                    <p class="preview">Every textbook warns about high dimensions. Yet deep learning succeeds in spaces with billions of dimensions. The contradiction is in the assumption, not the data.</p>
+                    <div class="meta">
+                        <span>Feb 10, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-purple-400">PROBABILITY & INFERENCE</span>
+                    <h3 class="title">The Mathematics of Uncertainty: Bayesian Inference Beyond Point Estimates</h3>
+                    <p class="preview">Data does not eliminate uncertainty. It transforms it. What changes with data is not the existence of uncertainty, but its structure.</p>
+                    <div class="meta">
+                        <span>Feb 08, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-blue-400">PATHOLOGY</span>
+                    <h3 class="title">Scaling Histopathology AI in Clinical Workflows</h3>
+                    <p class="preview">Analyzing the bottlenecks of integrating Deep Learning models into hospital LIS systems and solving the "Ground Truth" problem.</p>
+                    <div class="meta">
+                        <span>Feb 06, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-purple-400">MATHEMATICAL STRUCTURE</span>
+                    <h3 class="title">Geometry in High-Dimensional Biological Data</h3>
+                    <p class="preview">High-dimensional data appears complex. Most of the time, it is not. What appears as complexity is often a consequence of representation, not structure.</p>
+                    <div class="meta">
+                        <span>Feb 05, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+
+                <a href="blog.html" target="_blank" class="blog-card-mini">
+                    <span class="category text-purple-400">MATHEMATICAL MODELING</span>
+                    <h3 class="title">From Survival Functions to Distribution Shift</h3>
+                    <p class="preview">A model can be mathematically correct and still fail completely. The failure is not always due to noise, but to incorrect assumptions about how the world behaves.</p>
+                    <div class="meta">
+                        <span>Feb 02, 2026</span>
+                        <span class="read-more">Read <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </div>
+                </a>
+            </div>
         </div>
     </section>
 
+    <!-- ============================================== -->
+    <!-- SECTION 04: SKILLS                              -->
+    <!-- ============================================== -->
     <section id="skills" class="py-32 px-6 z-10 relative">
         <div class="max-w-5xl mx-auto text-center">
             <h2 class="text-3xl font-bold mb-16" data-aos="fade-up"><span class="text-blue-500">04.</span> Technical Arsenal</h2>
@@ -327,7 +613,6 @@
         <div class="flex justify-center gap-6 mt-2 text-xl">
             <a href="https://github.com/nikkipikkii/" class="hover:text-white transition"><i class="fa-brands fa-github"></i></a>
             <a href="https://www.linkedin.com/in/nandini-s-73b3953a5/" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
-            <!-- <a href="#" class="hover:text-white transition"><i class="fa-brands fa-twitter"></i></a> -->
         </div>
     </footer>
 
@@ -335,7 +620,6 @@
     <script>
         AOS.init({ duration: 800, once: true, offset: 100 });
 
-        // --- BACKGROUND ANIMATION LOGIC (UPDATED: 2-STEP BULK) ---
         function createSpill() {
             const container = document.getElementById('spill-container');
             const icons = ['fa-dna', 'fa-microchip', 'fa-flask', 'fa-code', 'fa-brain', 'fa-bacteria', 'fa-server', 'fa-notes-medical', 'fa-robot', 'fa-vial', 'fa-network-wired', 'fa-file-code'];
@@ -375,7 +659,6 @@
 
         window.addEventListener('load', createSpill);
 
-        // --- PROJECT DATA ---
         const projects = {
             oncorisk: {
                 title: "OncoRisk: Survival Predictor", 
@@ -407,17 +690,6 @@
                 achievements: ["Successful legacy system migration", "Automated workflows", "98.4% model accuracy"],
                 skills: { "PyTorch": "92%", "Computer Vision": "88%", "Data Privacy": "90%" }
             }
-            /* labsync: {
-                title: "Lab-Sync Secure API", 
-                link: "#",
-                status: "Completed", type: "API Design",
-                date: "Jan 2024 - May 2024", team: "Lab-Connect Integration",
-                desc: "Engineered a high-performance Node.js API that bridges wet-lab equipment data with secure electronic health records (EHR). Focused on low-latency data synchronization.",
-                tech: ["Node.js", "PostgreSQL", "Redis", "HL7/FHIR"],
-                achievements: ["Secure EHR sync", "Low-latency architecture", "FHIR standard compliance"],
-                skills: { "Backend Dev": "94%", "Database Design": "86%", "API Security": "92%" }
-            } 
-            */
         };
 
         function selectProject(id) {
