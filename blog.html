@@ -1,311 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Research Notes | Nandini</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
-    <style>
-        body { background-color: #000000; color: #f3f4f6; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
-        .spotlight {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.1) 0%, rgba(0, 0, 0, 0) 50%);
-            z-index: -1; pointer-events: none;
-        }
-
-        .sidebar-scroll::-webkit-scrollbar { width: 6px; }
-        .sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
-        .sidebar-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-
-        .prose h2 { font-size: 1.8rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #fff; }
-        .prose h3 { font-size: 1.4rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #e5e7eb; }
-        .prose p { margin-bottom: 1.25rem; line-height: 1.8; color: #d1d5db; }
-        .prose ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.25rem; color: #d1d5db; }
-        .prose blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; font-style: italic; color: #9ca3af; margin: 1.5rem 0; }
-        .prose code { background: rgba(59, 130, 246, 0.1); color: #60a5fa; padding: 2px 6px; rounded: 4px; font-family: monospace; }
-
-        .active-post { 
-            background: rgba(59, 130, 246, 0.15); 
-            border-left: 3px solid #3b82f6; 
-            color: #60a5fa; 
-        }
-
-        /* --- ANIMATIONS --- */
-
-        /* 1. Falling In (Stacking) */
-        @keyframes fall-stack {
-            0% { transform: translateY(-100vh) rotate(0deg); opacity: 0; }
-            20% { opacity: 1; }
-            80% { transform: translateY(0) rotate(var(--rot)); opacity: 1; }
-            90% { transform: translateY(-10px) rotate(var(--rot)); } 
-            100% { transform: translateY(0) rotate(var(--final-rot)); opacity: 0.8; }
-        }
-
-        /* 2. Falling OUT (Reset/Flush) */
-        @keyframes fall-out {
-            0% { transform: translateY(0) rotate(var(--final-rot)); opacity: 0.8; }
-            100% { transform: translateY(100vh) rotate(180deg); opacity: 0; }
-        }
-
-        .falling-icon {
-            position: absolute;
-            bottom: var(--bottom-pos);
-            left: var(--left-pos);
-            font-size: var(--size);
-            color: var(--color);
-            opacity: 0;
-            animation: fall-stack 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-            animation-delay: var(--delay);
-            pointer-events: none;
-            z-index: 0; 
-            filter: drop-shadow(0 0 5px currentColor);
-        }
-
-        /* Class added via JS when resetting */
-        .flushing-icon {
-            animation: fall-out 1s ease-in forwards !important;
-        }
-
-        /* 3. Blog Entry Slide Up */
-        @keyframes slide-up-fade {
-            0% { opacity: 0; transform: translateY(30px) scale(0.98); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .animate-entry {
-            animation: slide-up-fade 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
-    </style>
-</head>
-<body class="flex flex-col h-screen overflow-hidden">
-
-    <div class="spotlight"></div>
-
-    <nav class="w-full bg-[#000000] border-b border-white/10 z-50 flex-none">
-        <div class="max-w-7xl mx-auto px-4 md:px-6 h-16 flex justify-between items-center">
-            <a href="index.html" class="text-lg font-bold hover:opacity-80 transition">
-                <i class="fa-solid fa-arrow-left mr-2 text-sm text-gray-500"></i> <span class="text-blue-500">N</span>andini.
-            </a>
-            <div class="text-xs font-mono text-gray-500">RESEARCH LOG_V1.0</div>
-        </div>
-    </nav>
-
-    <div class="flex flex-1 max-w-7xl mx-auto w-full overflow-hidden">
-        
-        <aside class="w-full md:w-80 border-r border-white/10 bg-[#0a0a0a] flex flex-col md:flex hidden md:block relative overflow-hidden">
-            
-            <div id="sidebar-spill" class="absolute inset-0 w-full h-full pointer-events-none z-0"></div>
-
-            <div class="p-6 border-b border-white/10 relative z-10 bg-[#0a0a0a]/90 backdrop-blur-sm">
-                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Index</h3>
-            </div>
-            
-            <div class="sidebar-scroll overflow-y-auto flex-1 p-4 space-y-2 relative z-10" id="post-list">
-                </div>
-        </aside>
-
-        <main class="flex-1 overflow-y-auto relative bg-[#000000] p-6 md:p-12 scroll-smooth" id="main-scroll">
-            
-            <div class="md:hidden mb-8">
-                <select onchange="loadPost(this.value)" id="mobile-select" class="w-full bg-[#111] border border-gray-700 text-white p-3 rounded-lg">
-                </select>
-            </div>
-
-            <div class="max-w-3xl mx-auto pt-4 pb-20 prose" id="post-content">
-            </div>
-
-            <div class="max-w-3xl mx-auto border-t border-white/10 pt-8 mt-20 text-center text-sm text-gray-600">
-                End of entry.
-            </div>
-        </main>
-    </div>
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init();
-
-        const posts = [
-            {
-                id: 1,
-                title: "Scaling Histopathology AI",
-                date: "Feb 06, 2026",
-                category: "Pathology",
-                content: `
-                    <span class="text-blue-500 font-mono text-xs mb-4 block">PATHOLOGY • 8 MIN READ</span>
-                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Scaling Histopathology AI in Clinical Workflows</h1>
-                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">Analyzing the bottlenecks of integrating Deep Learning models into hospital LIS systems and solving the "Ground Truth" problem.</p>
-                    
-                    <h2>The "Ground Truth" Problem</h2>
-                    <p>One of the biggest hurdles in training models for pathology is the disagreement rate between human experts. Unlike a cat vs. dog classifier, identifying the exact grade of a tumor is subjective.</p>
-                    <blockquote>"If two pathologists disagree 30% of the time, what is the model actually learning?"</blockquote>
-                    <p>To solve this, we implemented a <strong>Consensus-Based Labeling Pipeline</strong>. We aggregate annotations from three different sub-specialists and use a weighted voting system to determine the ground truth mask for training our CNNs.</p>
-                `
-            },
-            {
-                id: 2,
-                title: "Python vs R in Biotech",
-                date: "Jan 12, 2026",
-                category: "Tech Stack",
-                content: `
-                    <span class="text-purple-500 font-mono text-xs mb-4 block">TECH STACK • 5 MIN READ</span>
-                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Why Python Won the Biotech War</h1>
-                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">R is fantastic for statistics, but Python is the language of production engineering. Here is why the shift happened.</p>
-                    
-                    <h2>The Deep Learning Factor</h2>
-                    <p>While R has interfaces for Keras, the native support for <code>PyTorch</code> and <code>TensorFlow</code> in Python makes it the default choice for modern computational biology.</p>
-                `
-            },
-            {
-                id: 3,
-                title: "Building Medical APIs",
-                date: "Dec 20, 2025",
-                category: "Engineering",
-                content: `
-                    <span class="text-green-500 font-mono text-xs mb-4 block">ENGINEERING • 6 MIN READ</span>
-                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">HIPAA Compliance in API Design</h1>
-                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">How to architect a REST API that handles sensitive patient data without violating privacy laws.</p>
-                    
-                    <h2>Encryption Everywhere</h2>
-                    <p>It is not enough to encrypt data at rest. You must ensure TLS 1.3 is enforced for all data in transit.</p>
-                `
-            }
-        ];
-
-        let pileHeight = 0; // Tracks current height
-
-        function initBlog() {
-            const listContainer = document.getElementById('post-list');
-            const mobileSelect = document.getElementById('mobile-select');
-            
-            posts.forEach((post, index) => {
-                const btn = document.createElement('button');
-                btn.className = `w-full text-left p-4 rounded-lg transition-all duration-200 hover:bg-white/10 mb-1 group ${index === 0 ? 'active-post' : 'text-gray-400'}`;
-                btn.onclick = () => loadPost(post.id);
-                btn.id = `btn-${post.id}`;
-                btn.innerHTML = `
-                    <div class="text-[10px] font-mono opacity-50 mb-1 group-hover:text-blue-400">${post.date}</div>
-                    <div class="font-bold text-sm leading-tight">${post.title}</div>
-                `;
-                listContainer.appendChild(btn);
-
-                const opt = document.createElement('option');
-                opt.value = post.id;
-                opt.text = post.title;
-                mobileSelect.appendChild(opt);
-            });
-
-            loadPost(posts[0].id);
-        }
-
-        function loadPost(id) {
-            const post = posts.find(p => p.id == id);
-            const contentArea = document.getElementById('post-content');
-            
-            contentArea.classList.remove('animate-entry');
-            contentArea.style.opacity = '0';
-
-            setTimeout(() => {
-                contentArea.innerHTML = post.content;
-                contentArea.classList.add('animate-entry');
-                document.getElementById('main-scroll').scrollTop = 0;
-            }, 50);
-
-            document.querySelectorAll('#post-list button').forEach(b => {
-                b.classList.remove('active-post', 'text-blue-500');
-                b.classList.add('text-gray-400');
-            });
-            const activeBtn = document.getElementById(`btn-${id}`);
-            if(activeBtn) {
-                activeBtn.classList.remove('text-gray-400');
-                activeBtn.classList.add('active-post');
-            }
-            document.getElementById('mobile-select').value = id;
-
-            // Trigger Icons
-            triggerSmartSpill();
-        }
-
-        // --- INTELLIGENT FILL & FLUSH LOGIC ---
-        function triggerSmartSpill() {
-            const container = document.getElementById('sidebar-spill');
-            const icons = ['fa-dna', 'fa-microchip', 'fa-flask', 'fa-code', 'fa-brain', 'fa-file-code', 'fa-vial'];
-            const colors = ['#60a5fa', '#a78bfa', '#34d399', '#f472b6', '#22d3ee'];
-
-            const viewportHeight = window.innerHeight;
-
-            // 1. CHECK IF FULL (Reset if > 90% of screen)
-            if (pileHeight > (viewportHeight * 0.9)) {
-                flushIcons();
-                return; // Stop here, let the flush happen first
-            }
-
-            // 2. ADD NEW ICONS
-            // Add 15 new icons per click
-            for(let i=0; i<15; i++) {
-                const icon = document.createElement('i');
-                const randomIcon = icons[Math.floor(Math.random() * icons.length)];
-                
-                icon.classList.add('fa-solid', randomIcon, 'falling-icon');
-                
-                // Random position
-                const leftPos = Math.floor(Math.random() * 85) + '%'; 
-                
-                // Height logic: Stack on top of current pile
-                const floor = pileHeight; 
-                const ceiling = pileHeight + 100; // Add 100px range
-                const bottomPos = Math.floor(Math.random() * (ceiling - floor) + floor) + 'px';
-
-                const delay = (Math.random() * 0.5) + 's'; 
-                const size = Math.floor(Math.random() * 20 + 12) + 'px'; 
-                const rotation = Math.floor(Math.random() * 360) + 'deg';
-                const color = colors[Math.floor(Math.random() * colors.length)];
-
-                icon.style.setProperty('--left-pos', leftPos);
-                icon.style.setProperty('--bottom-pos', bottomPos);
-                icon.style.setProperty('--delay', delay);
-                icon.style.setProperty('--size', size);
-                icon.style.setProperty('--rot', rotation);
-                icon.style.setProperty('--final-rot', Math.floor(Math.random() * 360) + 'deg');
-                icon.style.setProperty('--color', color);
-                
-                container.appendChild(icon);
-            }
-
-            // Increase pile height for next time
-            pileHeight += 80; 
-        }
-
-        function flushIcons() {
-            const allIcons = document.querySelectorAll('.falling-icon');
-            
-            // Apply flush animation to all existing icons
-            allIcons.forEach(icon => {
-                // Random delay for natural "collapse" feel
-                icon.style.animationDelay = (Math.random() * 0.3) + 's';
-                icon.classList.add('flushing-icon');
-            });
-
-            // Cleanup DOM after animation completes
-            setTimeout(() => {
-                const container = document.getElementById('sidebar-spill');
-                container.innerHTML = ''; // Wipe clean
-                pileHeight = 0; // Reset counter
-                
-                // Optional: Start fresh batch immediately after flush
-                triggerSmartSpill(); 
-            }, 1200);
-        }
-
-        initBlog();
-
-    </script>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -395,6 +87,79 @@
             font-weight: 600;
             margin-bottom: 4px;
         }
+
+        /* Animation Toggle Button */
+        .toggle-btn {
+            position: relative;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .toggle-btn:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .toggle-btn.disabled-state {
+            background: rgba(248, 113, 113, 0.1);
+            border-color: rgba(248, 113, 113, 0.3);
+            color: #f87171;
+        }
+
+        .toggle-btn.disabled-state:hover {
+            background: rgba(248, 113, 113, 0.2);
+        }
+
+        .toggle-switch {
+            width: 32px;
+            height: 18px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 10px;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #60a5fa;
+            border-radius: 50%;
+            top: 2px;
+            right: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-btn.disabled-state .toggle-switch {
+            background: rgba(248, 113, 113, 0.3);
+        }
+
+        .toggle-btn.disabled-state .toggle-switch::after {
+            background: #f87171;
+            right: auto;
+            left: 2px;
+        }
+
+        /* Hide all icons when animation is disabled */
+        .animations-disabled .falling-icon {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden">
@@ -417,7 +182,13 @@
             <div id="sidebar-spill" class="absolute inset-0 w-full h-full pointer-events-none z-0"></div>
 
             <div class="p-6 border-b border-white/10 relative z-10 bg-[#0a0a0a]/90 backdrop-blur-sm">
-                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest">Index</h3>
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Index</h3>
+                
+                <!-- Animation Toggle Button -->
+                <button id="animation-toggle" class="toggle-btn" onclick="toggleAnimations()">
+                    <span><i class="fa-solid fa-sparkles mr-2"></i>Animations: <span id="toggle-status">ON</span></span>
+                    <div class="toggle-switch"></div>
+                </button>
             </div>
             
             <div class="sidebar-scroll overflow-y-auto flex-1 p-4 space-y-2 relative z-10" id="post-list">
@@ -444,7 +215,231 @@
     <script>
         AOS.init();
 
+        let animationsEnabled = true;
+
         const posts = [
+            {
+                id: 7,
+                title: "Why Optimization Lies: The Geometry of Loss Landscapes",
+                date: "Feb 12, 2026",
+                category: "Optimization Theory",
+                isNew: true,
+                content: `
+                    <span class="text-pink-500 font-mono text-xs mb-4 block">OPTIMIZATION THEORY • 9 MIN READ</span>
+                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Why Optimization Lies: The Geometry of Loss Landscapes</h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Gradient descent does not find the minimum. It finds something else entirely. Understanding what that "something else" is requires looking at the geometry of loss surfaces, not just their values.
+                    </p>
+
+                    <h2>The Optimization Illusion</h2>
+                    <p>
+                    Modern deep learning rests on a quietly false assumption: that training a neural network is a problem of minimization. We define a loss function <code>L(θ)</code>, compute its gradient, and follow the steepest descent. The implicit narrative is that we are searching for a global minimum.
+                    </p>
+
+                    <p>
+                    This narrative is mathematically incoherent. Neural networks are non-convex, high-dimensional, and over-parameterized. The probability of any optimization algorithm reaching a true global minimum in such a landscape is effectively zero. Yet these models work remarkably well.
+                    </p>
+
+                    <blockquote>"If we are not finding minima, what exactly are we finding?"</blockquote>
+
+                    <h2>Critical Points in High Dimensions</h2>
+                    <p>
+                    In low dimensions, critical points are easy to classify. The Hessian matrix <code>H = ∇²L(θ)</code> tells us whether we are at a minimum, maximum, or saddle point based on its eigenvalues. In high dimensions, this classification becomes statistically improbable.
+                    </p>
+
+                    <pre><code>For θ ∈ ℝ<sup>n</sup> with n large:
+P(all eigenvalues of H > 0) → 0
+P(at least one eigenvalue < 0) → 1</code></pre>
+
+                    <p>
+                    This means in high-dimensional spaces, almost every critical point is a saddle point, not a minimum. The probability of finding a true local minimum decreases exponentially with dimension.
+                    </p>
+
+                    <h2>The Saddle Point Problem</h2>
+                    <p>
+                    A saddle point satisfies <code>∇L(θ) = 0</code> but has both positive and negative curvature. Gradient descent slows dramatically near saddle points because the gradient vanishes, but the algorithm has no inherent mechanism to escape them.
+                    </p>
+
+                    <p>
+                    The mathematical structure becomes clear when we examine the loss along principal curvatures:
+                    </p>
+
+                    <pre><code>L(θ + εv) ≈ L(θ) + ½ε² λ<sub>v</sub></code></pre>
+
+                    <p>
+                    where <code>λ<sub>v</sub></code> is the eigenvalue of <code>H</code> in direction <code>v</code>. When some <code>λ<sub>v</sub> > 0</code> and others <code>λ<sub>v</sub> < 0</code>, the surface curves upward in some directions and downward in others. The algorithm can only see local information, making escape difficult without curvature awareness.
+                    </p>
+
+                    <h2>Flat Minima vs Sharp Minima</h2>
+                    <p>
+                    Empirical evidence suggests that not all minima generalize equally. Networks that converge to "flat" minima generalize better than those that find "sharp" minima, even when both achieve the same training loss. The distinction is geometric:
+                    </p>
+
+                    <pre><code>Flat minimum:  small ||H||, high volume basin
+Sharp minimum: large ||H||, low volume basin</code></pre>
+
+                    <p>
+                    This connects optimization to information theory. By the Minimum Description Length principle, flat minima correspond to simpler models requiring fewer bits to describe. Sharp minima encode the training data too precisely, capturing noise rather than structure.
+                    </p>
+
+                    <h2>The Implicit Bias of Gradient Descent</h2>
+                    <p>
+                    Stochastic gradient descent does not minimize loss. It performs an implicit regularization that biases solutions toward flat regions of the loss surface. The stochastic noise from mini-batching acts like temperature in a physical system, allowing escape from sharp minima while settling in flat ones.
+                    </p>
+
+                    <p>
+                    Mathematically, SGD approximates a stochastic differential equation:
+                    </p>
+
+                    <pre><code>dθ = -∇L(θ)dt + σ(θ) dW</code></pre>
+
+                    <p>
+                    where <code>dW</code> is Brownian motion and <code>σ(θ)</code> is the noise covariance. This is not pure optimization; it is a sampling process from a Gibbs distribution proportional to <code>exp(-L(θ)/T)</code>, where temperature <code>T</code> emerges from the noise structure.
+                    </p>
+
+                    <h2>The Loss Landscape is Connected</h2>
+                    <p>
+                    A surprising result from recent research: in deep networks, low-loss regions are not isolated valleys. They form connected manifolds. Two independently trained networks that both achieve low loss can be connected by a continuous path along which loss remains low.
+                    </p>
+
+                    <p>
+                    This implies the loss surface is fundamentally different from the bumpy landscape we typically imagine. It is more like a network of interconnected ridges and plateaus, where many distinct solutions are mathematically equivalent.
+                    </p>
+
+                    <h2>Reframing the Question</h2>
+                    <p>
+                    Once we accept that optimization does not find minima, the entire mathematical framing changes. The relevant question is no longer "what is the lowest point?" but "what is the structure of low-loss regions, and which solutions within them generalize?"
+                    </p>
+
+                    <p>
+                    This shift transforms optimization from a pure minimization problem into a question of geometry, sampling, and information. The success of deep learning is not because we solve optimization problems well. It is because the geometry of loss landscapes happens to be benign in ways we are only beginning to understand.
+                    </p>
+
+                    <p class="mt-6">
+                    The lesson is humbling. We have built a field on the language of optimization while quietly relying on phenomena that optimization theory cannot explain. Mathematical honesty requires acknowledging this gap rather than papering over it with convergence proofs that do not apply.
+                    </p>
+                `
+            },
+            {
+                id: 8,
+                title: "The Curse of Dimensionality is a Lie: How Data Lives in Lower Dimensions",
+                date: "Feb 10, 2026",
+                category: "Geometric Deep Learning",
+                isNew: true,
+                content: `
+                    <span class="text-cyan-500 font-mono text-xs mb-4 block">GEOMETRIC DEEP LEARNING • 8 MIN READ</span>
+                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">The Curse of Dimensionality is a Lie: How Data Lives in Lower Dimensions</h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Every machine learning textbook warns about the curse of dimensionality. Yet deep learning models routinely succeed in spaces with billions of dimensions. The contradiction is not in the data, but in the assumption.
+                    </p>
+
+                    <h2>The Theoretical Curse</h2>
+                    <p>
+                    The curse of dimensionality, first formalized by Richard Bellman in 1961, predicts that as dimensions increase, data becomes increasingly sparse. The volume of an <code>n</code>-dimensional unit hypercube grows exponentially, meaning any finite dataset becomes vanishingly small relative to the space it inhabits.
+                    </p>
+
+                    <pre><code>Volume of unit ball in ℝ<sup>n</sup>:
+V<sub>n</sub> = π<sup>n/2</sup> / Γ(n/2 + 1)
+
+As n → ∞: V<sub>n</sub> → 0</code></pre>
+
+                    <p>
+                    Counterintuitively, the volume of the unit ball approaches zero as dimensions grow. Most of the volume of a high-dimensional sphere lies near its surface. Two random points in high dimensions are almost always far apart and orthogonal.
+                    </p>
+
+                    <p>
+                    By this reasoning, learning should be impossible in high dimensions. We would need exponentially many samples to cover the space. Yet a network trained on millions of images, each with hundreds of thousands of pixel values, generalizes from samples that fill an infinitesimally small fraction of the input space.
+                    </p>
+
+                    <h2>The Resolution: Manifold Hypothesis</h2>
+                    <p>
+                    The contradiction dissolves once we recognize that real data does not fill its ambient space. A 256×256 RGB image lives in <code>ℝ<sup>196608</sup></code>, but the set of "natural images" occupies a vanishingly small subset of this space.
+                    </p>
+
+                    <p>
+                    Random pixel arrangements produce noise, not images. The manifold of meaningful images is shaped by the physics of light, the structure of objects, and the statistics of natural scenes. Its intrinsic dimension is dramatically lower than the ambient dimension.
+                    </p>
+
+                    <p>
+                    Formally, the <strong>manifold hypothesis</strong> states:
+                    </p>
+
+                    <pre><code>Data X ⊂ ℝ<sup>D</sup> lies on or near
+a manifold M with dim(M) = d ≪ D</code></pre>
+
+                    <p>
+                    This single assumption resolves the apparent paradox. We are not learning in high-dimensional space; we are learning the structure of a low-dimensional manifold embedded within it.
+                    </p>
+
+                    <h2>Measuring Intrinsic Dimension</h2>
+                    <p>
+                    The intrinsic dimension of data can be estimated through several mathematical approaches. The correlation dimension, derived from fractal geometry, measures how the number of point pairs within distance <code>r</code> scales with <code>r</code>:
+                    </p>
+
+                    <pre><code>C(r) ∝ r<sup>d</sup></code></pre>
+
+                    <p>
+                    where <code>d</code> is the intrinsic dimension. For natural image datasets like ImageNet, this estimate consistently yields values around 30 to 50, despite ambient dimensions in the hundreds of thousands.
+                    </p>
+
+                    <p>
+                    Another approach uses the eigenvalue spectrum of local covariance matrices. The intrinsic dimension at a point <code>x</code> is the number of significant eigenvalues:
+                    </p>
+
+                    <pre><code>d(x) = #{λ<sub>i</sub> : λ<sub>i</sub> > τ · λ<sub>1</sub>}</code></pre>
+
+                    <p>
+                    where <code>τ</code> is a threshold and <code>λ<sub>1</sub></code> is the largest eigenvalue. This local measure reveals that intrinsic dimension can vary across the data, reflecting different regions of complexity.
+                    </p>
+
+                    <h2>Why Neural Networks Succeed</h2>
+                    <p>
+                    Deep neural networks succeed not by overcoming the curse of dimensionality, but by implicitly exploiting the manifold structure. Each layer performs a transformation that progressively flattens the data manifold, mapping it from a curved low-dimensional surface in high-dimensional space to a flat representation where classification becomes linear.
+                    </p>
+
+                    <p>
+                    The compositional structure of networks mirrors the hierarchical structure of natural data. Local patterns combine into parts, parts combine into objects, objects combine into scenes. This decomposition aligns with how the data manifold is generated.
+                    </p>
+
+                    <p>
+                    Mathematically, a network with sufficient capacity can approximate any continuous function on a manifold to arbitrary precision, given that the manifold has bounded geometry. The relevant theorem is not the universal approximation theorem in <code>ℝ<sup>n</sup></code>, but its restriction to manifold domains:
+                    </p>
+
+                    <pre><code>For continuous f: M → ℝ<sup>k</sup> with M compact,
+∃ network N s.t. ||N - f||<sub>∞</sub> < ε</code></pre>
+
+                    <h2>Geometric Deep Learning</h2>
+                    <p>
+                    Recognizing the manifold structure has given rise to <strong>geometric deep learning</strong>, which designs architectures aware of the underlying geometry. Convolutional networks exploit translation invariance on Euclidean grids. Graph neural networks operate on irregular topologies. Equivariant networks respect rotational and other symmetries.
+                    </p>
+
+                    <p>
+                    The unifying principle is that priors should be encoded geometrically rather than learned from scratch. By constraining models to respect the symmetries of the data manifold, we drastically reduce the effective dimensionality of the learning problem.
+                    </p>
+
+                    <h2>Implications for Sample Complexity</h2>
+                    <p>
+                    The classical bound on sample complexity scales as <code>O(ε<sup>-D</sup>)</code> with ambient dimension <code>D</code>. Under the manifold hypothesis, this becomes <code>O(ε<sup>-d</sup>)</code>, where <code>d</code> is the intrinsic dimension. The exponential gap explains why deep learning works with finite data despite catastrophic worst-case bounds.
+                    </p>
+
+                    <p>
+                    For a face image manifold with intrinsic dimension <code>d ≈ 50</code>, learning requires sample sizes manageable in practice. For random noise filling all of <code>ℝ<sup>196608</sup></code>, learning would be impossible. The difference is not in the algorithm. It is in the geometry of the data.
+                    </p>
+
+                    <h2>The Reframed Question</h2>
+                    <p>
+                    The curse of dimensionality is not wrong. It correctly describes what happens when data fills high-dimensional space uniformly. The error is in assuming this scenario applies to real data. Real data has structure, and that structure is geometric.
+                    </p>
+
+                    <p>
+                    The proper question is not "how do we cope with high dimensions?" but "what is the intrinsic geometry of our data, and how do we design models that respect it?" This shift transforms machine learning from a battle against dimensionality into a discipline of geometric inference.
+                    </p>
+
+                    <p class="mt-6">
+                    Mathematics has been quietly correct all along. Volumes do collapse, distances do concentrate, and high-dimensional spaces are mostly empty. The miracle is not that we have escaped these facts, but that the data we care about never inhabited those spaces to begin with.
+                    </p>
+                `
+            },
             {
                 id: 5,
                 title: "The Mathematics of Uncertainty: Bayesian Inference Beyond Point Estimates",
@@ -825,10 +820,36 @@
             }
             document.getElementById('mobile-select').value = id;
 
-            triggerSmartSpill();
+            // Only trigger animations if enabled
+            if (animationsEnabled) {
+                triggerSmartSpill();
+            }
+        }
+
+        function toggleAnimations() {
+            animationsEnabled = !animationsEnabled;
+            const toggleBtn = document.getElementById('animation-toggle');
+            const toggleStatus = document.getElementById('toggle-status');
+            const sidebar = document.querySelector('aside');
+            
+            if (animationsEnabled) {
+                toggleStatus.textContent = 'ON';
+                toggleBtn.classList.remove('disabled-state');
+                sidebar.classList.remove('animations-disabled');
+            } else {
+                toggleStatus.textContent = 'OFF';
+                toggleBtn.classList.add('disabled-state');
+                sidebar.classList.add('animations-disabled');
+                // Clear all existing icons immediately
+                const container = document.getElementById('sidebar-spill');
+                container.innerHTML = '';
+                pileHeight = 0;
+            }
         }
 
         function triggerSmartSpill() {
+            if (!animationsEnabled) return;
+            
             const container = document.getElementById('sidebar-spill');
             const icons = ['fa-dna', 'fa-microchip', 'fa-flask', 'fa-code', 'fa-brain', 'fa-file-code', 'fa-vial'];
             const colors = ['#60a5fa', '#a78bfa', '#34d399', '#f472b6', '#22d3ee'];
@@ -871,6 +892,8 @@
         }
 
         function flushIcons() {
+            if (!animationsEnabled) return;
+            
             const allIcons = document.querySelectorAll('.falling-icon');
             
             allIcons.forEach(icon => {
@@ -882,7 +905,9 @@
                 const container = document.getElementById('sidebar-spill');
                 container.innerHTML = '';
                 pileHeight = 0;
-                triggerSmartSpill(); 
+                if (animationsEnabled) {
+                    triggerSmartSpill(); 
+                }
             }, 1200);
         }
 
