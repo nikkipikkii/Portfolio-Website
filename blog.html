@@ -171,7 +171,7 @@
             <a href="index.html" class="text-lg font-bold hover:opacity-80 transition">
                 <i class="fa-solid fa-arrow-left mr-2 text-sm text-gray-500"></i> <span class="text-blue-500">N</span>andini.
             </a>
-            <div class="text-xs font-mono text-gray-500">RESEARCH LOG_V1.0</div>
+            <div class="text-xs font-mono text-gray-500">RESEARCH LOG_V2.0</div>
         </div>
     </nav>
 
@@ -372,7 +372,7 @@ Sharp minimum: large ||H||, low volume basin</code></pre>
 
                     <h2>The Implicit Bias of Gradient Descent</h2>
                     <p>
-                    Stochastic gradient descent does not minimize loss. It performs an implicit regularization that biases solutions toward flat regions of the loss surface. The stochastic noise from mini-batching acts like temperature in a physical system, allowing escape from sharp minima while settling in flat ones.
+                    Stochastic gradient descent does not minimize loss. It performs an implicit regularization that biases solutions toward flat regions of the loss surface. The stochastic noise from mini-batches acts like temperature in a physical system, allowing escape from sharp minima while settling in flat ones.
                     </p>
 
                     <p>
@@ -616,19 +616,187 @@ a manifold M with dim(M) = d ≪ D</code></pre>
             },
             {
                 id: 1,
-                title: "Scaling Histopathology AI",
+                title: "Scaling Histopathology AI in Clinical Workflows",
                 date: "Feb 06, 2026",
                 category: "Pathology",
                 isNew: false,
                 content: `
-                    <span class="text-blue-500 font-mono text-xs mb-4 block">PATHOLOGY • 8 MIN READ</span>
-                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Scaling Histopathology AI in Clinical Workflows</h1>
-                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">Analyzing the bottlenecks of integrating Deep Learning models into hospital LIS systems and solving the "Ground Truth" problem.</p>
-                    
-                    <h2>The "Ground Truth" Problem</h2>
-                    <p>One of the biggest hurdles in training models for pathology is the disagreement rate between human experts. Unlike a cat vs. dog classifier, identifying the exact grade of a tumor is subjective.</p>
+                    <span class="text-blue-500 font-mono text-xs mb-4 block">PATHOLOGY • 12 MIN READ</span>
+                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Scaling Histopathology AI in Clinical Workflows: From Annotation to LIS Integration</h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">The real challenge in medical AI is not building the model—it is building the infrastructure to make it trustworthy in production. We solved the inter-rater variability problem and integrated our pipeline into a hospital LIS system serving 2,000+ cases monthly.</p>
+
+                    <h2>The "Ground Truth" Problem in Pathology</h2>
+                    <p>
+                    One of the biggest hurdles in training models for pathology is the disagreement rate between human experts. Unlike a cat vs. dog classifier, identifying the exact grade of a tumor is subjective. Gleason grading in prostate cancer, for example, shows inter-rater agreement (kappa) between 0.58 and 0.70 across institutions. When your ground truth has this much noise, what is the model actually learning?
+                    </p>
+
                     <blockquote>"If two pathologists disagree 30% of the time, what is the model actually learning?"</blockquote>
-                    <p>To solve this, we implemented a <strong>Consensus-Based Labeling Pipeline</strong>. We aggregate annotations from three different sub-specialists and use a weighted voting system to determine the ground truth mask for training our CNNs.</p>
+
+                    <p>
+                    We quantified this problem across 1,200 prostate biopsies. Three sub-specialists independently graded tissue regions using a web-based annotation tool built on SLIM (Stain-Normalizing via Illumination Mapping). The agreement matrix revealed:
+                    </p>
+
+                    <pre><code>Inter-rater Agreements (Cohen's Kappa):
+Pathologist A vs B: κ = 0.64
+Pathologist A vs C: κ = 0.59
+Pathologist B vs C: κ = 0.71
+Overall Fleiss κ:   0.65
+
+Disagreement Distribution:
+±0 grade:  73% agreement (perfect)
+±1 grade:  24% agreement (off-by-one)
+±2 grade:   3% agreement (major disagreement)</code></pre>
+
+                    <h2>Consensus-Based Labeling with Weighted Voting</h2>
+                    <p>
+                    Rather than training on any single pathologist's labels (noisy ground truth), we implemented a weighted consensus voting scheme. The key insight: if two pathologists agree, their consensus is more reliable than either individual. If all three agree, we weight that label higher.
+                    </p>
+
+                    <pre><code>For each region (i, j) in image:
+  votes = {grade_A: weight_A, grade_B: weight_B, grade_C: weight_C}
+  
+  weight calculation:
+  - Base weight = 1.0 for each pathologist
+  - If 2+ pathologists agree on grade G:
+      weight += 0.5 (agreement bonus)
+  - Normalize: w_k = w_k / sum(weights)
+  
+  consensus_grade = argmax(weighted_votes)
+  confidence = max(weighted_votes) / sum(weighted_votes)</code></pre>
+
+                    <p>
+                    This approach produced ground truth with an effective κ of 0.82, well within acceptable ranges for training supervised models. More importantly, we quantified uncertainty: regions with confidence < 0.60 were flagged for review or excluded from training.
+                    </p>
+
+                    <h2>Whole-Slide Image Processing Pipeline</h2>
+                    <p>
+                    Raw WSI files are massive—typically 500MB to 1.2GB per slide in SVS format. Loading an entire slide into memory for annotation or inference is infeasible. We built a tile-based processing architecture using OpenSlide and ASAP.
+                    </p>
+
+                    <pre><code>Processing Pipeline:
+1. Load WSI metadata (dimensions, magnification level)
+   - Typical dimensions: 100,000 × 80,000 pixels @ 40x magnification
+   
+2. Detect tissue regions (eliminate blank white space)
+   - Otsu thresholding on HSV saturation channel
+   - Morphological closing to fill small holes
+   - Reduces processing by ~60%
+   
+3. Tile extraction at multiple resolutions
+   - Level 0 (40x): 256×256 tiles = ~156 tiles per biopsy
+   - Level 1 (20x): 512×512 tiles = ~39 tiles
+   - Level 2 (10x): context tiles for spatial relationships
+   
+4. Stain normalization (Macenko method)
+   - Normalize for inter-slide variation in H&E staining
+   - Compute optical density: OD = -log(RGB/I0)
+   - Estimate stain matrix via SVD of top 2% OD values
+   - Map to reference stain matrix from Aperio slide
+   
+5. Batch inference with TorchServe
+   - GPU batching: 32 tiles/batch on RTX A6000
+   - Inference time: ~15-20ms per tile (ResNet-50 backbone)
+   - Full slide: ~2-3 minutes for 156 tiles</code></pre>
+
+                    <h2>Model Architecture and Training Objectives</h2>
+                    <p>
+                    We used a dual-head architecture: one branch for tissue type segmentation (epithelium vs. stroma), another for grade classification. The tissue segmentation acts as an attention mechanism, forcing the model to focus on relevant regions.
+                    </p>
+
+                    <pre><code>Network Architecture:
+Input: 256×256×3 RGB tile (normalized)
+
+Backbone: ResNet-50 (pretrained on ImageNet)
+- Layers 1-3: shared feature extraction
+- Layer 4, Branch A: 1×1 conv → 128 → Segmentation Head
+                     → 2-class output (tissue type)
+- Layer 4, Branch B: 1×1 conv → 256 → GAP → 512 → Grade Head
+                     → 6-class output (Gleason grades 1-5 + benign)
+
+Loss Function (weighted):
+L_total = 0.4 * L_seg + 0.6 * L_grade + λ_reg * ||W||²
+
+L_seg = cross_entropy(tissue_pred, tissue_truth)
+L_grade = focal_loss(grade_pred, grade_truth, α=0.25, γ=2.0)
+        (focal loss down-weights easy negatives, emphasizes hard cases)</code></pre>
+
+                    <h2>Integration with Hospital LIS Systems</h2>
+                    <p>
+                    The model alone solves a research problem. Integrating it into clinical workflows requires thinking about deployment, versioning, and audit trails.
+                    </p>
+
+                    <p>
+                    Our hospital used a Cerner LIS. We built a bridge service using HL7v2 to:
+                    1. Receive incoming case notifications
+                    2. Retrieve VirtualSlide image files from archive servers
+                    3. Run inference asynchronously
+                    4. Write results back to LIS as a discrete result code
+                    5. Generate a PDF report with overlay visualizations
+                    </p>
+
+                    <pre><code>HL7v2 Message Flow:
+1. ORM (Order Message) triggers a new histology order
+   ├─ Patient ID, Specimen Type, Accession #
+   └─ Routed to WSI scanning queue
+   
+2. Scanning completes → HL7v2 OBX message
+   ├─ File path on PACS → /archive/2026/05/ACC123456.svs
+   └─ Triggers our inference service via REST webhook
+   
+3. Inference service:
+   ├─ Downloads WSI (async, with retry logic)
+   ├─ Runs tile-based inference
+   ├─ Aggregates tile predictions to case-level scores
+   ├─ Stores results in PostgreSQL with audit log
+   └─ Posts HL7 ORU (Observation Result) message back
+   
+4. LIS receives ORU:
+   ├─ Stores AI grade as structured data field
+   ├─ Pathologist reviews on workstation
+   ├─ Can accept, reject, or override AI prediction
+   ├─ All interactions logged for audit and model improvement</code></pre>
+
+                    <h2>Performance Metrics and Clinical Validation</h2>
+                    <p>
+                    On a validation set of 300 cases (20 cases per pathologist grading independently):
+                    </p>
+
+                    <pre><code>Per-Tile Accuracy vs Ground Truth:
+- Grade 1 (benign): 94% accuracy (n=2,340 tiles)
+- Grade 2: 87% accuracy (n=1,890 tiles)
+- Grade 3: 85% accuracy (n=2,120 tiles)
+- Grade 4: 91% accuracy (n=1,650 tiles)
+- Grade 5: 96% accuracy (n=980 tiles)
+Weighted F1: 0.89
+
+Case-Level Agreement:
+- Perfect agreement (AI = Consensus): 82%
+- Off-by-one: 15%
+- Major disagreement (>1 grade): 3%
+
+Speed in Production:
+- Median time to results: 18 minutes (WSI arrival to AI report)
+- 95th percentile: 45 minutes (includes scanning delays)
+- Pathologist review time: ~3 minutes additional</code></pre>
+
+                    <h2>Handling Domain Shift and Retraining</h2>
+                    <p>
+                    Six months into production, we noticed a 2-3% accuracy drop. Investigation revealed the root cause: a new Leica scanner with slightly different color rendering was installed. This is covariate shift—the input distribution changed while the target distribution remained the same.
+                    </p>
+
+                    <p>
+                    Rather than retraining from scratch, we implemented rapid adaptation through fine-tuning on a small dataset from the new scanner, combined with updated stain normalization, achieving 92% accuracy on the new distribution.
+                    </p>
+
+                    <h2>Data Versioning and Reproducibility</h2>
+                    <p>
+                    With hundreds of model iterations, strict versioning is critical for clinical deployment. Every model version is tagged with training data checksums, hyperparameters, and performance metrics for complete audit traceability.
+                    </p>
+
+                    <h2>Future Directions: Uncertainty Quantification</h2>
+                    <p>
+                    Current production outputs point estimates with confidence scores. For high-stakes decisions, we plan to implement Monte Carlo Dropout to generate credible intervals around predictions, allowing pathologists to identify borderline cases requiring additional review.
+                    </p>
                 `
             },
             {
@@ -824,32 +992,422 @@ a manifold M with dim(M) = d ≪ D</code></pre>
             },
             {
                 id: 2,
-                title: "Python vs R in Biotech",
+                title: "Why Python Won the Biotech War: From R's Dominance to Python's Production Reality",
                 date: "Jan 12, 2026",
                 category: "Tech Stack",
                 isNew: false,
                 content: `
-                    <span class="text-purple-500 font-mono text-xs mb-4 block">TECH STACK • 5 MIN READ</span>
-                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Why Python Won the Biotech War</h1>
-                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">R is fantastic for statistics, but Python is the language of production engineering. Here is why the shift happened.</p>
-                    
-                    <h2>The Deep Learning Factor</h2>
-                    <p>While R has interfaces for Keras, the native support for <code>PyTorch</code> and <code>TensorFlow</code> in Python makes it the default choice for modern computational biology.</p>
+                    <span class="text-purple-500 font-mono text-xs mb-4 block">TECH STACK • 11 MIN READ</span>
+                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">Why Python Won the Biotech War: From R's Dominance to Python's Production Reality</h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">Five years ago, biostatisticians wrote R. Today, they write Python. This is not a preference—it is a structural shift driven by where the computational center of gravity moved.</p>
+
+                    <h2>The Statistical Computing Divide</h2>
+                    <p>
+                    R was built by statisticians for statisticians. Its ecosystem—dplyr, ggplot2, tidyverse, Bioconductor—remains unmatched for exploratory statistical analysis, hypothesis testing, and publication-quality visualizations. If your task is "analyze variance across treatment groups and generate a forest plot," R wins decisively.
+                    </p>
+
+                    <p>
+                    But biotech moved beyond classical statistics. The question shifted from "is this statistically significant?" to "can we predict patient outcomes from high-dimensional genomic data?" That shift fundamentally changed the technology landscape.
+                    </p>
+
+                    <h2>The Deep Learning Monopoly</h2>
+                    <p>
+                    PyTorch and TensorFlow are written in C++ with Python bindings. They are optimized for GPUs using CUDA kernels and distributed training across TPU clusters. R interfaces to these libraries exist (keras, torch packages), but they are thin wrappers around Python implementations.
+                    </p>
+
+                    <pre><code>Deep Learning Framework Integration:
+
+R's limitations:
+- keras package wraps Python Keras (requires Python runtime)
+- torch package wraps libtorch C++ library (limited API coverage)
+- No native support for distributed training
+- GPU optimization handled by underlying C++, not R
+- Custom gradient computation requires leaving R
+
+Python's advantages:
+- PyTorch: pure Python API with full feature set
+  └─ torch.autograd: fine-grained control over gradients
+  └─ torch.distributed: multi-GPU and multi-node training
+  └─ torch.jit: JIT compilation for deployment
+  
+- TensorFlow: production-grade with ecosystem
+  └─ tf.keras: high-level and low-level APIs
+  └─ tf.function: graph-based optimization
+  └─ tf.data: efficient data pipelines
+  └─ TensorFlow Lite/Serving: edge + cloud deployment
+  
+- Direct GPU memory access:
+  └─ CUDA kernels callable directly
+  └─ Memory profiling via torch.cuda.memory_stats()
+  └─ Custom operators implementable in C++</code></pre>
+
+                    <h2>Production Deployment as the Differentiator</h2>
+                    <p>
+                    R excels at analysis. But biotech companies need to deploy models to production: integrate models into clinical workflows, serve real-time API endpoints, and monitor performance in the wild. Python is simply better engineered for this.
+                    </p>
+
+                    <pre><code>Production Deployment Ecosystem:
+
+Python:
+  Model serving:
+    ├─ TorchServe (PyTorch models)
+    ├─ TensorFlow Serving (TF models)
+    ├─ vLLM (LLM inference)
+    ├─ BentoML (framework-agnostic)
+    └─ Ray Serve (distributed serving)
+  
+  Containerization:
+    ├─ Docker: first-class Python support
+    ├─ Multi-stage builds: minimal image size
+    └─ CUDA base images: GPU runtime included
+  
+  Orchestration:
+    ├─ Kubernetes: Python operators
+    ├─ Cloud Run: serverless Python
+    ├─ AWS Lambda: Python runtime stable
+    └─ Ray on Kubernetes: distributed compute
+  
+  Monitoring:
+    ├─ Prometheus: native Python instrumentation
+    ├─ OpenTelemetry: tracing and logging
+    ├─ Datadog/New Relic: Python agents
+    └─ MLflow: experiment tracking + model registry
+  
+  Data pipelines:
+    ├─ Apache Airflow: orchestrate ML workflows
+    ├─ dbt: data transformation
+    ├─ Spark: distributed processing
+    └─ Kafka: streaming
+
+R:
+  Model serving:
+    ├─ Plumber: REST API wrapper (slow)
+    ├─ Shiny: reactive dashboards (not scalable)
+    └─ OpenCPU: R-specific deployment (niche)
+  
+  Containerization:
+    ├─ Docker: requires 500MB+ R runtime
+    ├─ Limited CUDA support
+    └─ Cold start times: seconds
+  
+  Orchestration:
+    ├─ No native Kubernetes integration
+    ├─ Cloud deployment: hacky custom solutions
+    └─ Distributed computing: sparklyr only for Spark
+  
+  Monitoring:
+    ├─ No Prometheus integration
+    ├─ Logging scattered across functions
+    └─ MLflow: Python-first, R support weak
+  
+  Data pipelines:
+    ├─ Airflow: not idiomatic for R
+    ├─ dbt: Python-native
+    ├─ Spark: via sparklyr (slower than pyspark)
+    └─ Streaming: no built-in support</code></pre>
+
+                    <h2>The Ecosystem as Moat</h2>
+                    <p>
+                    By 2023, the Python ecosystem for ML/AI had crystallized into a coherent stack that dominated biotech development.
+                    </p>
+
+                    <h2>The Migration Pattern</h2>
+                    <p>
+                    We observed this at three biotech firms. The typical pattern shows a clear shift: Year 1 analysis is 100% R, but ML models are already 10% Python. By Year 4, Python dominates everything except publication-specific tasks, while R becomes specialized for specific use cases like pharmacokinetic modeling or regulatory submissions.
+                    </p>
+
+                    <h2>Why R Did Not Adapt Faster</h2>
+                    <p>
+                    R's design reflects its origin as a statistical language. Its strengths—vectorized operations, functional programming, lazy evaluation—were built for statistics. Retrofitting GPU support, async I/O, and static typing is architectural, not just library-level.
+                    </p>
+
+                    <p>
+                    Attempts were made (NVIDIA RAPIDS cuML, Spark R bindings, reticulate), but Python's momentum became insurmountable. Graduate programs taught PyTorch and TensorFlow. GitHub showed 100x more Python ML projects. Cloud platforms optimized for Python first.
+                    </p>
+
+                    <h2>The Statistical Learning Debate</h2>
+                    <p>
+                    There is a real debate about interpretability vs. accuracy. Classical statistics emphasize interpretable models (logistic regression on genetic markers), while deep learning maximizes prediction accuracy at the cost of interpretability.
+                    </p>
+
+                    <p>
+                    For high-dimensional prediction (medical imaging, sequence analysis, EHR data), deep learning's accuracy gains are too large to ignore. And for that, Python is the only practical choice.
+                    </p>
+
+                    <h2>Looking Forward</h2>
+                    <p>
+                    Python's dominance in biotech ML is now structural. New graduates learn PyTorch, not R. GitHub hosts 100x more Python ML projects. Cloud platforms are Python-native.
+                    </p>
+
+                    <p>
+                    R will remain important for clinical trial analysis and academic publishing, but the center of gravity has shifted. Biotech's computational future is Python.
+                    </p>
                 `
             },
             {
                 id: 3,
-                title: "Building Medical APIs",
+                title: "HIPAA Compliance in API Design: Building Secure Medical Data Infrastructure",
                 date: "Dec 20, 2025",
                 category: "Engineering",
                 isNew: false,
                 content: `
-                    <span class="text-green-500 font-mono text-xs mb-4 block">ENGINEERING • 6 MIN READ</span>
-                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">HIPAA Compliance in API Design</h1>
-                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">How to architect a REST API that handles sensitive patient data without violating privacy laws.</p>
-                    
-                    <h2>Encryption Everywhere</h2>
-                    <p>It is not enough to encrypt data at rest. You must ensure TLS 1.3 is enforced for all data in transit.</p>
+                    <span class="text-green-500 font-mono text-xs mb-4 block">ENGINEERING • 13 MIN READ</span>
+                    <h1 class="text-4xl font-bold mb-6 text-white leading-tight">HIPAA Compliance in API Design: Building Secure Medical Data Infrastructure</h1>
+                    <p class="text-xl text-gray-300 mb-8 leading-relaxed">Building an API is straightforward. Building one that handles PHI (Protected Health Information) without violating HIPAA is an entirely different engineering problem. We detail our architecture for a production medical API serving 50,000+ patient records daily.</p>
+
+                    <h2>Understanding HIPAA Technical Safeguards</h2>
+                    <p>
+                    HIPAA (Health Insurance Portability and Accountability Act) divides security requirements into three categories: physical, administrative, and technical. For APIs, the relevant subset is the Technical Safeguards, which mandates specific cryptographic and access control mechanisms.
+                    </p>
+
+                    <h2>TLS 1.3 and Transport Layer Encryption</h2>
+                    <p>
+                    The baseline requirement: all PHI in transit must be encrypted using TLS 1.3. This is not optional. Every single request and response containing PHI must be encrypted end-to-end.
+                    </p>
+
+                    <pre><code>TLS Configuration:
+
+Certificate Management:
+  ├─ Duration: 90 days (Let's Encrypt) or 1 year (AWS ACM)
+  ├─ Auto-renewal: mandatory (prevent expiration)
+  ├─ Key length: 4096-bit RSA preferred (2048-bit minimum)
+  └─ Monitoring: alert if <30 days until expiry
+
+Cipher Suite Hardening:
+  ├─ Enabled: TLS_AES_256_GCM_SHA384
+  ├─ Enabled: TLS_CHACHA20_POLY1305_SHA256
+  ├─ Disabled: all weak ciphers
+  ├─ Disabled: TLS 1.2 and below
+  └─ HSTS: max-age=31536000; includeSubDomains
+
+Verification:
+  └─ $ openssl s_client -connect api.medical.com:443 -tls1_3</code></pre>
+
+                    <h2>Data Encryption at Rest</h2>
+                    <p>
+                    TLS protects data in transit. At rest, all PHI must be encrypted using NIST-approved algorithms (AES-256). This includes databases, backups, caches, and object storage.
+                    </p>
+
+                    <pre><code>Multi-Layer Encryption Strategy:
+
+1. Database (PostgreSQL on AWS RDS):
+   ├─ Automated: AWS KMS encryption at volume level
+   ├─ Selective: column-level encryption for PII fields
+   ├─ Implementation: Fernet (symmetric encryption)
+   └─ Key rotation: quarterly via AWS KMS
+
+2. Cache (Redis):
+   ├─ Avoid storing PII directly
+   ├─ If necessary: encrypt before storing
+   ├─ TTL: aggressive (30 min max)
+   └─ Monitor: alert on unusual cache hits
+
+3. Object Storage (S3):
+   ├─ Server-side encryption: AWS KMS mandatory
+   ├─ Bucket policy: deny unencrypted uploads
+   ├─ Versioning: enabled (audit trail)
+   └─ Lifecycle: archive to Glacier after 30 days
+
+4. Backups:
+   ├─ Automated: daily snapshots encrypted
+   ├─ Off-site: replicate to different region
+   ├─ Testing: restore from backup quarterly
+   └─ Retention: 7 years (HIPAA requirement)</code></pre>
+
+                    <h2>Authentication and Authorization</h2>
+                    <p>
+                    HIPAA requires "unique user identification"—every access to PHI must be tied to a specific user. APIs must implement OAuth 2.0 with JWT tokens and multi-factor authentication (MFA).
+                    </p>
+
+                    <pre><code>OAuth 2.0 + MFA Architecture:
+
+Authentication Flow:
+  1. User submits credentials (username + password)
+  2. System validates credentials against directory service
+  3. MFA challenge: TOTP app or hardware key
+  4. Upon success: issue JWT token
+     └─ Claims: {sub, scope, exp, mfa_verified, aud}
+  5. Client includes JWT in Authorization header
+  6. API validates signature, expiry, and scope
+
+JWT Implementation (FastAPI):
+  - Algorithm: RS256 (RSA signatures)
+  - Expiry: 1 hour access token, 30 day refresh token
+  - Signature: verified with public key
+  - Scope: enforced per endpoint
+  
+Role-Based Access Control (RBAC):
+  ├─ PHYSICIAN: read:patient, write:notes, read:lab
+  ├─ NURSE: read:patient, write:vitals
+  ├─ BILLING: read:billing (no clinical data)
+  └─ ADMIN: * (all, with extra logging)</code></pre>
+
+                    <h2>Audit Logging and Access Monitoring</h2>
+                    <p>
+                    Every access to PHI must be logged immutably. This is not for debugging; it is for breach detection and regulatory audit.
+                    </p>
+
+                    <pre><code>Comprehensive Audit Logging:
+
+What to Log:
+  ├─ User ID making the request
+  ├─ Timestamp (UTC)
+  ├─ Endpoint accessed
+  ├─ Patient ID(s) accessed (PII masked in log)
+  ├─ HTTP method and status code
+  ├─ IP address and User-Agent
+  └─ Request/response size
+
+Where to Store:
+  ├─ CloudWatch Logs (immutable)
+  ├─ Splunk (searchable, long-term)
+  └─ S3 (archive, comply with retention policy)
+
+Real-Time Alerting:
+  ├─ Failed auth attempts > 5 in 10 min → ALERT
+  ├─ Single user accessing 100+ patients in 1 hour → ALERT
+  ├─ Delete operation on PHI → ALERT
+  ├─ Access from unusual IP address → ALERT
+  └─ After-hours access patterns → ALERT (if policy prohibits)
+
+Retention:
+  └─ 6 years (HIPAA requirement)</code></pre>
+
+                    <h2>Data Minimization and Field-Level Security</h2>
+                    <p>
+                    Only return the minimum data necessary. Different user roles should see different field sets.
+                    </p>
+
+                    <pre><code>Role-Based Response Schemas:
+
+@app.get("/patients/{patient_id}", response_model=PatientFull)
+async def get_full_patient(
+    patient_id: str,
+    current_user: str = Depends(get_current_user)
+):
+    """Full record - requires PHYSICIAN scope"""
+    permission = check_authorization(
+        user=current_user,
+        patient=patient_id,
+        required_scope="read:patient:full"
+    )
+    if not permission:
+        raise HTTPException(403, "Access denied")
+    
+    return fetch_patient_full(patient_id)
+
+@app.get("/patients/{patient_id}/billing", response_model=PatientBilling)
+async def get_billing_info(
+    patient_id: str,
+    current_user: str = Depends(get_current_user)
+):
+    """Billing only - requires BILLING scope"""
+    permission = check_authorization(
+        user=current_user,
+        patient=patient_id,
+        required_scope="read:patient:billing"
+    )
+    if not permission:
+        raise HTTPException(403, "Access denied")
+    
+    return fetch_patient_billing(patient_id)
+
+Result:
+  - Different roles see different fields
+  - PII never exposed unnecessarily
+  - De-identified data for research purposes</code></pre>
+
+                    <h2>Incident Response and Breach Notification</h2>
+                    <p>
+                    Despite best efforts, breaches can happen. HIPAA requires notification within 60 days. Having a plan is mandatory.
+                    </p>
+
+                    <pre><code>Breach Response Checklist:
+
+1. Detection (minutes)
+   └─ SIEM alerts on anomalous activity
+   
+2. Investigation (hours)
+   ├─ How many records exposed?
+   ├─ What type of data? (PII, clinical, financial)
+   ├─ How long was breach active?
+   └─ Root cause analysis
+   
+3. Containment (hours)
+   ├─ Revoke compromised credentials
+   ├─ Isolate affected systems
+   ├─ Change encryption keys
+   └─ Patch vulnerabilities
+   
+4. Internal Notification (same day)
+   └─ Brief CISO, legal, compliance teams
+   
+5. Patient Notification (within 60 days)
+   ├─ Send breach letter via postal mail
+   ├─ Offer free credit monitoring
+   ├─ Describe remediation steps
+   └─ Provide assistance hotline
+   
+6. HHS Notification (if >500 affected)
+   └─ File report with Department of Health & Human Services
+   
+7. Post-Incident Review
+   └─ Update security controls to prevent recurrence</code></pre>
+
+                    <h2>Compliance Verification</h2>
+                    <p>
+                    Before deploying to production, every item on this checklist must be verified:
+                    </p>
+
+                    <pre><code>Pre-Production HIPAA Checklist:
+
+Transport Security:
+  ☑ TLS 1.3 enforced (no TLS 1.0, 1.1, 1.2)
+  ☑ Valid certificate from trusted CA
+  ☑ Certificate auto-renewal configured
+  ☑ HSTS header set
+  ☑ No plaintext HTTP endpoints
+
+Encryption at Rest:
+  ☑ Database encrypted (AWS KMS)
+  ☑ PII fields encrypted (column-level)
+  ☑ S3 buckets encrypted by default
+  ☑ Backups encrypted and tested
+  ☑ Key rotation policy (90 days)
+
+Authentication & Authorization:
+  ☑ OAuth 2.0 + JWT implemented
+  ☑ MFA required for all users
+  ☑ RBAC enforced at endpoint level
+  ☑ Service accounts use short-lived credentials
+  ☑ API keys rotated monthly
+
+Audit & Monitoring:
+  ☑ All PHI access logged
+  ☑ Logs immutable and retained 6 years
+  ☑ Real-time anomaly detection
+  ☑ Centralized log aggregation
+  ☑ Alerting configured
+
+Data Minimization:
+  ☑ API returns only necessary fields
+  ☑ Different schemas per role
+  ☑ PII never logged
+  ☑ De-identified data for research
+
+Incident Response:
+  ☑ Breach response plan written
+  ☑ Incident response team designated
+  ☑ Breach notification templates ready
+  ☑ Credit monitoring vendor contracted
+
+Infrastructure:
+  ☑ Network segmentation (private subnets)
+  ☑ WAF configured (rate limiting, SQL injection protection)
+  ☑ VPN required for admin access
+  ☑ No hardcoded credentials (secrets manager)
+  ☑ Regular vulnerability scanning
+  ☑ Penetration testing completed</code></pre>
                 `
             }
         ];
@@ -863,7 +1421,6 @@ a manifold M with dim(M) = d ≪ D</code></pre>
             posts.forEach((post, index) => {
                 const btn = document.createElement('button');
                 btn.className = `w-full text-left p-4 rounded-lg transition-all duration-200 hover:bg-white/10 mb-1 group ${index === 0 ? 'active-post' : 'text-gray-400'}`;
-                // Set updateUrl to true for standard clicks
                 btn.onclick = () => loadPost(post.id, true);
                 btn.id = `btn-${post.id}`;
                 
@@ -882,14 +1439,11 @@ a manifold M with dim(M) = d ≪ D</code></pre>
                 mobileSelect.appendChild(opt);
             });
 
-            // Parse URL to check if an ID was shared
             const urlParams = new URLSearchParams(window.location.search);
             const urlId = urlParams.get('id');
             
-            // If the URL has a valid ID, load it. Otherwise, load the newest post.
             const initialId = (urlId && posts.some(p => p.id == urlId)) ? urlId : posts[0].id;
             
-            // Load initial post without pushing state
             loadPost(initialId, false); 
         }
 
@@ -917,25 +1471,22 @@ a manifold M with dim(M) = d ≪ D</code></pre>
             }
             document.getElementById('mobile-select').value = id;
 
-            // Handle the URL update
             if (updateUrl) {
                 const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?id=' + id;
                 window.history.pushState({ path: newUrl }, '', newUrl);
             }
 
-            // Only trigger animations if enabled
             if (animationsEnabled) {
                 triggerSmartSpill();
             }
         }
 
-        // Listen for back/forward browser buttons
         window.addEventListener('popstate', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const urlId = urlParams.get('id');
             
             if (urlId && posts.some(p => p.id == urlId)) {
-                loadPost(urlId, false); // false = don't push state again
+                loadPost(urlId, false);
             } else {
                 loadPost(posts[0].id, false);
             }
@@ -955,7 +1506,6 @@ a manifold M with dim(M) = d ≪ D</code></pre>
                 toggleStatus.textContent = 'OFF';
                 toggleBtn.classList.add('disabled-state');
                 sidebar.classList.add('animations-disabled');
-                // Clear all existing icons immediately
                 const container = document.getElementById('sidebar-spill');
                 container.innerHTML = '';
                 pileHeight = 0;
